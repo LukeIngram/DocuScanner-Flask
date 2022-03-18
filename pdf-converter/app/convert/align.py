@@ -51,25 +51,3 @@ def homography(img,src,dest):
     H, _ = cv2.findHomography(src,dest,method=cv2.RANSAC,ransacReprojThreshold=0.1)
     return cv2.warpPerspective(img,H,(w,h),flags=cv2.INTER_LINEAR)
 
-
-
-#TODO 2D angle adjustment 
-#   UNUSED
-def angleOffset(img,thresh): 
-    coords = np.column_stack(np.where(thresh > 0))
-    theta = cv2.minAreaRect(coords)[-1]
-    print(theta)
-    if theta < -45: 
-        theta = -(90 + theta)
-    else: 
-        theta = -theta
-    h,w = img.shape[:2]
-    center = (w//2,h//2)
-    M = cv2.getRotationMatrix2D(center,theta,1.0)
-    cos = np.abs(M[0, 0])
-    sin = np.abs(M[0, 1])
-    nW = int((h * sin) + (w * cos))
-    nH = int((h * cos) + (w * sin))
-    M[0, 2] += (nW / 2) - center[0]
-    M[1, 2] += (nH / 2) - center[1]
-    return cv2.warpAffine(img,M,(w,h),flags=cv2.INTER_CUBIC,borderMode=cv2.BORDER_REPLICATE)
