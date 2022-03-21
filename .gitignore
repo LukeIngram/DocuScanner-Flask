@@ -130,3 +130,7 @@ dmypy.json
 
 # MacOS Exclusive
 .DS_store
+
+
+# Flask
+config.py

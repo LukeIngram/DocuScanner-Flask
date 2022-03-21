@@ -23,7 +23,7 @@
 #   main.py
 
 import os,sys 
-from image import Img
+from scripts.image import Img
 import cv2
 
 
@@ -50,7 +50,7 @@ def imgToPdf(img,imgpath,dest):
         return -1
     
 
-def main(mode,imgpath,dest): 
+def main(imgpath,dest): 
     #   Basic security and image file checks, more robust version required for deployment
     #   TODO os.path checks are quite slow, maybe change to stat for better performance 
     (stauts,msg) = (-1,"unknown error")
@@ -65,16 +65,8 @@ def main(mode,imgpath,dest):
         if img.size == 0: 
             (status,msg) = (-1,"unable to open specified file")
         else: 
-            if (mode == "pdf"):  
-                if imgToPdf(img,imgpath,dest) < 0:
-                    (status,msg) = (-1,"unable to create pdf")
-                else:
-                    (status,msg) = (0,"conversion successful")
+            if imgToPdf(img,imgpath,dest) < 0:
+                (status,msg) = (-1,"unable to create pdf")
+            else:
+                (status,msg) = (0,"conversion successful")
     return (status,msg)
- 
-if __name__ == '__main__': 
-    if len(sys.argv) < 3: 
-        sys.exit(1); 
-    output =  main(sys.argv[1],sys.argv[2],sys.argv[3])
-    if output[0] < 0: 
-        sys.exit(output[1])

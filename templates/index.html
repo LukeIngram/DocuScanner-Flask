@@ -14,6 +14,18 @@
 
 <h2>Check our <a href="https://github.com/LukeIngram/img-to-pdf-converter-webapp">Github</a> for Progress Updates </h2>
 
+<p style="color: blue">
+	{% with messages = get_flashed_messages() %}
+	{% if messages %}
+	   {% for message in messages %}
+		  {{ message }}
+	   {% endfor %}
+	{% endif %}
+ {% endwith %} 
+</p>
+
+
+
 <form  method="post" action="" enctype="multipart/form-data">
 	  Select image to upload:
 		<input type="file" name="file" required>
