@@ -1,5 +1,4 @@
 from flask import Flask, render_template,request,redirect,url_for,abort,send_from_directory,flash
-from numpy import outer
 from werkzeug.utils import secure_filename 
 import os 
 from scripts.verify import *
