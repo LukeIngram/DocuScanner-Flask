@@ -45,6 +45,7 @@ def imgToPdf(img,imgpath,dest):
         f = open(dest+os.path.splitext(os.path.basename(imgpath))[0]+'.pdf',"w+b")
         f.write(bytearray(image.getPdf()))
         f.close()
+        #os.remove(imgpath)
         return 0
     except IOError: 
         return -1

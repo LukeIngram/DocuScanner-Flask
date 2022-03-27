@@ -36,7 +36,7 @@ def upload_file():
         outgoing = convertImg(fpath)
         if outgoing == None: 
             flash("Conversion Unsuccessful. Please Try a Different File.")
-        flash("Conversion Successful.")
+            return redirect(url_for('index'))
     return redirect(url_for('download',filename=outgoing))
 
 def convertImg(filename): 
@@ -49,6 +49,13 @@ def convertImg(filename):
 def download(filename): 
     try:
         return send_from_directory(app.config['OUTBOX_PATH'],filename,as_attachment=True)
+    except FileNotFoundError:
+        abort(500)
+
+@app.route("/display/<filename>")
+def display(filename): 
+    try:
+       return send_from_directory(app.config['UPLOAD_PATH'],filename)
     except FileNotFoundError:
         abort(500)
 
