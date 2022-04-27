@@ -42,12 +42,14 @@ def imgToPdf(img,imgpath,dest):
         if dest[-1] != '/': 
             dest += '/'
         image = Img(imgpath,img)
-        f = open(dest+os.path.splitext(os.path.basename(imgpath))[0]+'.pdf',"w+b")
-        f.write(bytearray(image.getPdf()))
+        f = open(dest+os.path.splitext(os.path.basename(imgpath))[0]+'.pdf',"wb+")
+        print(f)
+        f.write(image.getPdf())
         f.close()
         #os.remove(imgpath)
         return 0
-    except IOError: 
+    except IOError as e : 
+        print(e)
         return -1
     
 

@@ -82,4 +82,4 @@ class Img:
     def getPdf(self): 
         temp = cv2.cvtColor(self._imgdata,cv2.COLOR_BGR2RGB)
         pdf = tess.image_to_pdf_or_hocr(temp,extension='pdf')
-        return pdf
+        return bytearray(pdf)

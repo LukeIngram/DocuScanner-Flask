@@ -7,11 +7,8 @@ from pathlib import Path
 
 
 app = Flask(__name__)
-app.config.from_object('config')
-app.config["MAX_CONTENT_LENGTH"] = 10**7
-app.config['UPLOAD_EXTENSIONS'] = ['.jpg','.png','.jpeg']
-app.config['UPLOAD_PATH'] = './uploads'
-app.config['OUTBOX_PATH'] = './outbox'
+app.config.from_pyfile('keys/config.py')
+
 
 
 @app.route("/")
@@ -32,16 +29,23 @@ def upload_file():
             return redirect(url_for('index'))
         fpath = os.path.join(app.config["UPLOAD_PATH"],fname)
         file.save(fpath)
-        flash("File Successfully Uploaded. Your Download will Begin Shortly.")
-        outgoing = convertImg(fpath)
+        flash("File Successfully Uploaded. Evaluating your submission...")
+        if virustotal_scan(fpath):
+            flash("\nSomething went wrong, Please Try a Different File")
+            outgoing = None 
+        else: 
+            flash("\nConverting you image now. Your Download will Begin Shortly.")
+            outgoing = convertImg(fpath)
         if outgoing == None: 
-            flash("Conversion Unsuccessful. Please Try a Different File.")
+            flash("\nConversion Unsuccessful. Please Try a Different File.")
             return redirect(url_for('index'))
     return redirect(url_for('download',filename=outgoing))
 
 def convertImg(filename): 
-    if os.path.exists(filename): 
+    if os.path.exists(filename):
+        print(converter.main(filename,app.config["OUTBOX_PATH"])) 
         if converter.main(filename,app.config["OUTBOX_PATH"])[0] == 0:
+            
             return os.path.splitext(os.path.basename(filename))[0] + '.pdf'
     return None
 
