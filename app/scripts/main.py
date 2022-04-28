@@ -43,7 +43,6 @@ def imgToPdf(img,imgpath,dest):
             dest += '/'
         image = Img(imgpath,img)
         f = open(dest+os.path.splitext(os.path.basename(imgpath))[0]+'.pdf',"wb+")
-        print(f)
         f.write(image.getPdf())
         f.close()
         #os.remove(imgpath)

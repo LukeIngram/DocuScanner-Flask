@@ -24,18 +24,19 @@ def upload_file():
     fname = secure_filename(file.filename)
     if fname != '': 
         file_ext = os.path.splitext(fname)[1]
-        if file_ext not in app.config['UPLOAD_EXTENSIONS'] or file_ext != validate_image(file.stream):
+        if file_ext != validate_image(file.stream,file_ext):
             flash("Unsupported File. Supported Types: (png, jpg, jpeg)")
             return redirect(url_for('index'))
         fpath = os.path.join(app.config["UPLOAD_PATH"],fname)
         file.save(fpath)
         flash("File Successfully Uploaded. Evaluating your submission...")
-        if virustotal_scan(fpath):
-            flash("\nSomething went wrong, Please Try a Different File")
-            outgoing = None 
-        else: 
-            flash("\nConverting you image now. Your Download will Begin Shortly.")
-            outgoing = convertImg(fpath)
+        #if virustotal_scan(fpath):
+            #flash("\nSorry, this file cannot be accepted at this time, please wait 5 minutes and try again.")
+            #outgoing = None 
+       # else: 
+        sterilize_img(fpath)
+        flash("\nConverting you image now. Your Download will Begin Shortly.")
+        outgoing = convertImg(fpath)
         if outgoing == None: 
             flash("\nConversion Unsuccessful. Please Try a Different File.")
             return redirect(url_for('index'))
