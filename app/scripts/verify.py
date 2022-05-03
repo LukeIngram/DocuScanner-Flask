@@ -33,7 +33,7 @@ def sterilize_img(fpath):
 
     #TODO Further sterilization (as program currently only stops exif attacks)
     
-
+""" UNUSED 
 def virustotal_scan(fpath): #TODO virustotal api scanning 
 
     if os.path.exists(fpath): 
@@ -83,3 +83,4 @@ def virustotal_scan(fpath): #TODO virustotal api scanning
         
     else: 
         return True
+"""

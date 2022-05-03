@@ -1,3 +1,27 @@
+#   MIT License
+#
+#   Copyright (c) 2022 Luke Ingram
+#   
+#   Permission is hereby granted, free of charge, to any person obtaining a copy
+#   of this software and associated documentation files (the "Software"), to deal
+#   in the Software without restriction, including without limitation the rights
+#   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#   copies of the Software, and to permit persons to whom the Software is
+#   furnished to do so, subject to the following conditions:
+#   
+#   The above copyright notice and this permission notice shall be included in all
+#   copies or substantial portions of the Software.
+#   
+#   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+#   SOFTWARE.
+#   
+#   app.py
+
 from flask import Flask, render_template,request,redirect,url_for,abort,send_from_directory,flash
 from werkzeug.utils import secure_filename 
 import os 
@@ -30,7 +54,8 @@ def upload_file():
         fpath = os.path.join(app.config["UPLOAD_PATH"],fname)
         file.save(fpath)
         flash("File Successfully Uploaded. Evaluating your submission...")
-        #if virustotal_scan(fpath):
+
+        #if virustotal_scan(fpath): UNUSED adds too much overhead to request fulfillment 
             #flash("\nSorry, this file cannot be accepted at this time, please wait 5 minutes and try again.")
             #outgoing = None 
        # else: 
