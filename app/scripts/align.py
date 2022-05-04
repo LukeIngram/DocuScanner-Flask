@@ -7,17 +7,23 @@ import matplotlib.pyplot as plt
 
 def detectContour(img,img_shape): 
     canvas = np.zeros(img_shape,np.uint8)
-    contours,hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)
+    contours,hierarchy = cv2.findContours(img,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
     cnt = sorted(contours,key=cv2.contourArea,reverse=True)[0]
     cv2.drawContours(canvas,cnt,-1,(255,255,255),3)
     plt.imshow(canvas) 
     plt.savefig("contour.png")
     return canvas,cnt 
 
+#TODO add "draw the lightest rectangular contour that takes up atelast 20% of the total area checking"
+# to the detect contour function
+ 
+
 def detectCorners(canvas,cnt): #Utilizes the Douglas-Peuckert Algorithm
-    ep = 0.02 * cv2.arcLength(cnt,True) 
+    ep = 0.01 * cv2.arcLength(cnt,True) 
     appx_corners = cv2.approxPolyDP(cnt,ep,True)
-    cv2.drawContours(canvas,appx_corners,-1,(255,0,255),10)
+    cv2.drawContours(canvas,appx_corners,-1,(255,255,255),10)
+    plt.imshow(canvas) 
+    plt.savefig("corners.png")
     appx_corners = sorted(np.concatenate(appx_corners).tolist())
     appx_corners = np.array(appx_corners,dtype="float32")
 

@@ -12,7 +12,7 @@ class Img:
         self._raw = data
         self._name = name
         self._gray = self.erode(self.sharpen(self.set_grayscale(self._raw.copy())))
-        self._thresh = self.threshImg()
+        self._thresh = self.threshImg(self._gray)
         self._imgdata = self.alignImg()
 
 
@@ -29,22 +29,29 @@ class Img:
     def set_grayscale(self,data): 
         return cv2.cvtColor(data,cv2.COLOR_BGR2GRAY)
 
-    def threshImg(self): 
-        temp = cv2.GaussianBlur(self._gray.copy(),(5,5),0)
+    def threshImg(self,data): 
+        temp = cv2.GaussianBlur(data.copy(),(5,5),0)
         return cv2.threshold(temp,0,255,cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
+
+    def updateScales(self,data): 
+        self._gray = self.set_grayscale(data)
+        self._thresh = self.threshImg(self._gray)
 
     def alignImg(self):
         canvas,cnt = detectContour(self._thresh,self._thresh.shape)
         corners = detectCorners(canvas,cnt)
-        dest,w,h= destinationPoints(corners)
+        dest,w,h = destinationPoints(corners)
+        plt.imshow(self._gray) 
+        plt.savefig("gray.png")
+        plt.imshow(self._thresh) 
+        plt.savefig("thresh.png")
         R = homography(self._raw,np.float32(corners),dest)
+
         self.updateScales(R)
         return R[0:h,0:w]
         #TODO add cropping utility to alignImg method 
 
-    def updateScales(self,data): 
-        self._gray = self.set_grayscale(data)
-        self._thresh = self.threshImg()
+    
 
     #-----END PREPROCESSING---------
 
