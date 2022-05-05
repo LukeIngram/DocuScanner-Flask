@@ -25,36 +25,34 @@
 import os,sys 
 from scripts.image import Img
 import cv2
+import threading
 
 
-def preprocessingDebug(img,imgpath):
-    image = Img(imgpath,img)
-    image.display()
-    image.displayBoundingText()
 
-def getTextdebug(img,imgpath): 
-    image = Img(imgpath,img)
-    print("\nimg text:")
-    print('\n'+ image.getString())
 
-def imgToPdf(img,imgpath,dest): 
+def convert(img,imgpath,dest): 
     try: 
         if dest[-1] != '/': 
             dest += '/'
-        image = Img(imgpath,img)
-        f = open(dest+os.path.splitext(os.path.basename(imgpath))[0]+'.pdf',"wb+")
+        basename = os.path.splitext(os.path.basename(imgpath))[0]
+        image = Img(basename,img)
+        savepath = "img/" + basename
+        if not os.path.isdir(savepath):
+            os.mkdir(savepath)
+        worker = threading.Thread(target=image.saveAll,args=(savepath,))
+        worker.start()
+        f = open(dest+basename+'.pdf',"wb+")
         f.write(image.getPdf())
         f.close()
-        #os.remove(imgpath)
+        #worker.join()
+        
         return 0
-    except IOError as e : 
+    except IOError as e: 
         print(e)
         return -1
     
 
 def main(imgpath,dest): 
-    #   Basic security and image file checks, more robust version required for deployment
-    #   TODO os.path checks are quite slow, maybe change to stat for better performance 
     (stauts,msg) = (-1,"unknown error")
     if os.path.splitext(imgpath)[1] not in {".jpeg",".png",".jpg",".tiff",".tif"}:
         (status,msg) = (-1,"unsupported file format")
@@ -67,7 +65,7 @@ def main(imgpath,dest):
         if img.size == 0: 
             (status,msg) = (-1,"unable to open specified file")
         else: 
-            if imgToPdf(img,imgpath,dest) < 0:
+            if convert(img,imgpath,dest) < 0:
                 (status,msg) = (-1,"unable to create pdf")
             else:
                 (status,msg) = (0,"conversion successful")

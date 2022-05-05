@@ -55,10 +55,6 @@ def upload_file():
         file.save(fpath)
         flash("File Successfully Uploaded. Evaluating your submission...")
 
-        #if virustotal_scan(fpath): UNUSED adds too much overhead to request fulfillment 
-            #flash("\nSorry, this file cannot be accepted at this time, please wait 5 minutes and try again.")
-            #outgoing = None 
-       # else: 
         sterilize_img(fpath)
         flash("\nConverting you image now. Your Download will Begin Shortly.")
         outgoing = convertImg(fpath)

@@ -2,16 +2,13 @@
 
 import numpy as np 
 import cv2
-import matplotlib.pyplot as plt
 
 
 def detectContour(img,img_shape): 
     canvas = np.zeros(img_shape,np.uint8)
-    contours,hierarchy = cv2.findContours(img,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
-    cnt = sorted(contours,key=cv2.contourArea,reverse=True)[0]
-    cv2.drawContours(canvas,cnt,-1,(255,255,255),3)
-    #plt.imshow(canvas) 
-    #plt.savefig("contour.png")
+    contours,hierarchy = cv2.findContours(img,cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+    cnt = sorted(contours,key=cv2.contourArea,reverse=True)
+    cv2.drawContours(canvas,cnt[0],-1,(255,255,255),3)
     return canvas,cnt 
 
 #TODO add "draw the lightest rectangular contour that takes up atelast 20% of the total area checking"
@@ -22,8 +19,6 @@ def detectCorners(canvas,cnt): #Utilizes the Douglas-Peuckert Algorithm
     ep = 0.01 * cv2.arcLength(cnt,True) 
     appx_corners = cv2.approxPolyDP(cnt,ep,True)
     cv2.drawContours(canvas,appx_corners,-1,(255,255,255),10)
-    #plt.imshow(canvas) 
-    #plt.savefig("corners.png")
     appx_corners = sorted(np.concatenate(appx_corners).tolist())
     appx_corners = np.array(appx_corners,dtype="float32")
 
@@ -35,8 +30,6 @@ def detectCorners(canvas,cnt): #Utilizes the Douglas-Peuckert Algorithm
     diff = np.diff(appx_corners, axis=1)
     rect[1] = appx_corners[np.argmin(diff)]
     rect[3] = appx_corners[np.argmax(diff)]
-    #plt.imshow(canvas) 
-    #plt.savefig("rect.png")
     return rect
 
 

@@ -2,7 +2,6 @@
 
 import numpy as np 
 import cv2
-import matplotlib.pyplot as plt
 import pytesseract as tess
 from scripts.align import *
 
@@ -13,7 +12,9 @@ class Img:
         self._name = name
         self._gray = self.erode(self.sharpen(self.set_grayscale(self._raw.copy())))
         self._thresh = self.threshImg(self._gray)
-        self._imgdata = self.alignImg()
+        self._contours = detectContour(self._thresh,self._thresh.shape)
+        self._dewarped = self.alignImg()
+        self._annotated = self.identifyDocument()
 
 
     #-----BEGIN PREPROCESSING------
@@ -38,55 +39,47 @@ class Img:
         self._thresh = self.threshImg(self._gray)
 
     def alignImg(self):
-        canvas,cnt = detectContour(self._thresh,self._thresh.shape)
-        corners = detectCorners(canvas,cnt)
+        corners = detectCorners(self._contours[0],self._contours[1][0]) 
         dest,w,h = destinationPoints(corners)
-        #plt.imshow(self._gray) 
-       # plt.savefig("gray.png")
-       # plt.imshow(self._thresh) 
-        #plt.savefig("thresh.png")
         R = homography(self._raw,np.float32(corners),dest)
 
         self.updateScales(R)
         return R[0:h,0:w]
         #TODO add cropping utility to alignImg method 
 
-    
 
     #-----END PREPROCESSING---------
 
     #-----BEGIN DISPLAY METHODS---------
 
     #draw boxes around pre-processed image
-    def displayBoundingText(self): 
-        temp = self._imgdata.copy()
-        imgH,imgW, _ = temp.shape
-        boxes = tess.image_to_boxes(temp)
-
-        for box in boxes.splitlines(): 
-            box = box.split(' ')
-            x, y, w, h = int(box[1]),int(box[2]),int(box[3]),int(box[4])
-            cv2.rectangle(temp,(x,imgH-y),(w,imgH-h),(50,50,255),1)
-            #cv2.putText(temp,box[0],(x,imgH-y+20),cv2.FONT_HERSHEY_SIMPLEX,13,(50,205,50),4)
-
-        plt.imshow(cv2.cvtColor(temp,cv2.COLOR_BGR2RGB))
-        plt.title("Characters found in: \'%s\'"%(self._name))
-        plt.show()
-
-
-    def display(self):
-        temp = cv2.cvtColor(self._imgdata,cv2.COLOR_BGR2RGB)
-        plt.imshow(temp)
-        plt.title(self._name)
-        plt.show()
+    def identifyDocument(self): #TODO draw bounding rect around rectangular document
+        scale = 1 
+        fontScale = min(self._raw.shape[0],self._raw.shape[1])/(25/scale)
+        temp = self._raw.copy()
+        for cnt in self._contours[1]: 
+            approx = cv2.approxPolyDP(cnt,0.01*cv2.arcLength(cnt,True),True)
+            if len(approx) == 4: 
+                x,y,w,h = cv2.boundingRect(cnt)
+                cv2.rectangle(temp,(x,y),(x+w,y+h),(0,255,0),10)
+                cv2.drawContours(temp,cnt,-1,(255,255,255),3)
+                cv2.putText(temp,'Document',(x+w+10,y+h),0,10,(0,255,0))
+                break
+        return temp 
+            # Note this might annotate everything remotely square. & might be a problem in the future. 
 
     #-----END DISPLAY METHODS------------
 
-    def getString(self):
-        self.updateScales(self._imgdata)
-        return tess.image_to_string(self._imgdata) 
-    
+    def saveAll(self,dir):
+        cv2.imwrite(dir + '/contour' + '.jpeg',self._contours[0])
+        cv2.imwrite(dir + '/gray' + '.jpeg',self._gray)
+        cv2.imwrite(dir + '/thresh' + '.jpeg',self._thresh)
+        cv2.imwrite(dir + '/annotated' + '.jpeg',self._annotated)
+        cv2.imwrite(dir + '/dewarped' + '.jpeg',self._dewarped)
+        
+
+
     def getPdf(self): 
-        temp = cv2.cvtColor(self._imgdata,cv2.COLOR_BGR2RGB)
+        temp = cv2.cvtColor(self._dewarped,cv2.COLOR_BGR2RGB)
         pdf = tess.image_to_pdf_or_hocr(temp,extension='pdf')
         return bytearray(pdf)
