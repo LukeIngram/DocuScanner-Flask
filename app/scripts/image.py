@@ -1,7 +1,9 @@
 #   Image Class: Image.py
 
+from ctypes.wintypes import LPWIN32_FIND_DATAA
 import numpy as np 
 import cv2
+from pyparsing import identbodychars
 import pytesseract as tess
 from scripts.align import *
 
@@ -13,6 +15,7 @@ class Img:
         self._gray = self.erode(self.sharpen(self.set_grayscale(self._raw.copy())))
         self._thresh = self.threshImg(self._gray)
         self._contours = detectContour(self._thresh,self._thresh.shape)
+        self._corners = detectCorners(self._contours[0],self._contours[1])
         self._dewarped = self.alignImg()
         self._annotated = self.identifyDocument()
 
@@ -39,10 +42,12 @@ class Img:
         self._thresh = self.threshImg(self._gray)
 
     def alignImg(self):
-        corners = detectCorners(self._contours[0],self._contours[1][0]) 
+        corners = self._corners
+        if len(corners) == 0: 
+            return self._raw.copy()
+
         dest,w,h = destinationPoints(corners)
         R = homography(self._raw,np.float32(corners),dest)
-
         self.updateScales(R)
         return R[0:h,0:w]
         #TODO add cropping utility to alignImg method 
@@ -54,19 +59,40 @@ class Img:
 
     #draw boxes around pre-processed image
     def identifyDocument(self): #TODO draw bounding rect around rectangular document
-        scale = 1 
-        fontScale = min(self._raw.shape[0],self._raw.shape[1])/(25/scale)
         temp = self._raw.copy()
-        for cnt in self._contours[1]: 
-            approx = cv2.approxPolyDP(cnt,0.01*cv2.arcLength(cnt,True),True)
-            if len(approx) == 4: 
-                x,y,w,h = cv2.boundingRect(cnt)
-                cv2.rectangle(temp,(x,y),(x+w,y+h),(0,255,0),10)
-                cv2.drawContours(temp,cnt,-1,(255,255,255),3)
-                cv2.putText(temp,'Document',(x+30,y+h-20),cv2.FONT_HERSHEY_SIMPLEX,2,(0,255,0),3)
-                break
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        linWeight = 3
+        if (temp.shape[0]*temp.shape[1]) < 1000**2: 
+            linWeight = 1
+
+        if len(self._corners) == 0: 
+            text = 'NO DOCUMENT DETECTED'
+            fontScale = get_optimal_font_scale(text,(temp.shape[1]//2))
+            textSize = cv2.getTextSize(text,font,fontScale,linWeight+2)[0]
+            X = (temp.shape[1] - textSize[0])//2
+            Y = (temp.shape[0] + textSize[1])//2
+            r1 = (X,Y-(textSize[1]))
+            r2 = (r1[0]+textSize[0],r1[1]+textSize[1])
+            buffer = 20*linWeight
+            r1 = (r1[0]-buffer,r1[1]-buffer)
+            r2 = (r2[0]+buffer,r2[1]+buffer)
+            cv2.rectangle(temp,r1,r2,(255,0,0),-1)
+            cv2.rectangle(self._dewarped,r1,r2,(255,255,255),-1)
+            cv2.putText(temp,text,(X,Y),font,fontScale,(0,0,255),linWeight+2)
+            cv2.putText(self._dewarped,text,(X,Y),font,fontScale,(0,0,255),linWeight+2)
+
+        else: 
+            corners = np.int_(self._corners)
+            text = 'Document'
+            fontScale = get_optimal_font_scale(text,(corners[1][0]-corners[0][0])//4)
+            cv2.line(temp,tuple(corners[0]),tuple(corners[1]),(0,255,0),linWeight*3)
+            cv2.line(temp,tuple(corners[0]),tuple(corners[3]),(0,255,0),linWeight*3)
+            cv2.line(temp,tuple(corners[2]),tuple(corners[3]),(0,255,0),linWeight*3)
+            cv2.line(temp,tuple(corners[2]),tuple(corners[1]),(0,255,0),linWeight*3)
+            cv2.putText(temp,text,(corners[3][0]+(10*linWeight),corners[3][1]+(20*linWeight))\
+                                                ,font,fontScale,(0,255,0),linWeight)
         return temp 
-            # Note this might annotate everything remotely square. & might be a problem in the future. 
+
 
     #-----END DISPLAY METHODS------------
 
