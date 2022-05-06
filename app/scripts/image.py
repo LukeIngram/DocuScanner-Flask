@@ -63,7 +63,7 @@ class Img:
                 x,y,w,h = cv2.boundingRect(cnt)
                 cv2.rectangle(temp,(x,y),(x+w,y+h),(0,255,0),10)
                 cv2.drawContours(temp,cnt,-1,(255,255,255),3)
-                cv2.putText(temp,'Document',(x+w+10,y+h),0,10,(0,255,0))
+                cv2.putText(temp,'Document',(x+30,y+h-20),cv2.FONT_HERSHEY_SIMPLEX,2,(0,255,0),3)
                 break
         return temp 
             # Note this might annotate everything remotely square. & might be a problem in the future. 
