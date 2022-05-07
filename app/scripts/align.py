@@ -1,6 +1,5 @@
 #   align.py
 
-from cv2 import CV_32FC3
 import numpy as np 
 import cv2
 
@@ -14,9 +13,11 @@ def detectContour(img,img_shape):
 
 #TODO add "draw the lightest rectangular contour that takes up atelast 20% of the total area checking"
 # to the detect contour function
- 
+
+#TODO add alternate threshing method if no corners are found. 
 
 def detectCorners(canvas,contours): #Utilizes the Douglas-Peuckert Algorithm
+    points = []
     for cnt in contours: 
         if cv2.contourArea(cnt) > (0.3 * (canvas.shape[0] * canvas.shape[1])): 
             ep = 0.01 * cv2.arcLength(cnt,True) 
@@ -29,13 +30,13 @@ def detectCorners(canvas,contours): #Utilizes the Douglas-Peuckert Algorithm
                 rect = np.zeros((4, 2), dtype="float32")
                 s = appx_corners.sum(axis=1)
                 rect[0] = appx_corners[np.argmin(s)]
-                
                 rect[2] = appx_corners[np.argmax(s)]
                 diff = np.diff(appx_corners, axis=1)
                 rect[1] = appx_corners[np.argmin(diff)]
                 rect[3] = appx_corners[np.argmax(diff)]
-                return rect
-    return []
+                points = rect
+                print(points)
+    return points
 
 # Based off four-point-transform:  
 # https://github.com/meizhoubao/pyimagesearch/tree/master/getperspectivetransform
@@ -67,3 +68,5 @@ def get_optimal_font_scale(text, width):
       if (new_width <= width):
           return scale/10
     return 1
+
+#TODO algo for optimal thresh block and constant size

@@ -1,6 +1,5 @@
 #   Image Class: Image.py
 
-from ctypes.wintypes import LPWIN32_FIND_DATAA
 import numpy as np 
 import cv2
 from pyparsing import identbodychars
@@ -13,7 +12,7 @@ class Img:
         self._raw = data
         self._name = name
         self._gray = self.erode(self.sharpen(self.set_grayscale(self._raw.copy())))
-        self._thresh = self.threshImg(self._gray)
+        self._thresh = self.threshImg(self._gray,1)
         self._contours = detectContour(self._thresh,self._thresh.shape)
         self._corners = detectCorners(self._contours[0],self._contours[1])
         self._dewarped = self.alignImg()
@@ -24,31 +23,67 @@ class Img:
 
     def sharpen(self,data): 
         ker = np.ones((5,5),np.float32)/90
-        return cv2.filter2D(data,-1,ker)
+        return cv2.filter2D(data.copy(),-1,ker)
 
     def erode(self,data): 
         ker = np.ones((5,5),np.float32)/90
-        return cv2.erode(data,ker,iterations=1)
+        return cv2.erode(data.copy(),ker,iterations=1)
+
+    def dialate(self,data): 
+        temp = cv2.dilate(data.copy(),None,iterations=4)
+        return temp
 
     def set_grayscale(self,data): 
-        return cv2.cvtColor(data,cv2.COLOR_BGR2GRAY)
+        return cv2.cvtColor(data.copy(),cv2.COLOR_BGR2GRAY)
 
-    def threshImg(self,data): 
-        temp = cv2.GaussianBlur(data.copy(),(5,5),0)
-        return cv2.threshold(temp,0,255,cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
+    #TODO implement alterante threshing methods to handle more scenarios
+    # OR USE CLASHE Method for glare removal. 
+    def threshImg(self,data,mode): 
+        if mode == 1: #first try osu method
+            temp = cv2.GaussianBlur(data.copy(),(5,5),0)
+            temp = cv2.threshold(temp,0,255,cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
+        
+        elif mode == 2: #then adaptive mean 
+            temp = cv2.medianBlur(data.copy(),5)
+            temp = cv2.adaptiveThreshold(temp,255,cv2.ADAPTIVE_THRESH_MEAN_C,cv2.THRESH_BINARY,11,2) #TODO implement dynamic blocksize and constant calculation
+        
+        elif mode == 3: #then adaptive gaussian
+            temp = cv2.medianBlur(data.copy(),5)
+            temp = cv2.adaptiveThreshold(temp,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,11,2) #TODO implement dynamic blocksize and constant calculation
+        #then move into globals. 
 
-    def updateScales(self,data): 
+        else: #TODO
+            pass
+        return self.dialate(temp)
+
+    def updateScales(self,data,tmode): 
         self._gray = self.set_grayscale(data)
-        self._thresh = self.threshImg(self._gray)
+        self._thresh = self.threshImg(self._gray,tmode)
+        
+    def updateContour(self): 
+        self._contours = detectContour(self._thresh,self._thresh.shape)
 
+    def updateCorners(self): 
+        self._corners = detectCorners(self._contours[0],self._contours[1])
+
+    #TODO implement method to try alternate threshing if square contour is not found. 
     def alignImg(self):
         corners = self._corners
-        if len(corners) == 0: 
-            return self._raw.copy()
+
+        i = 1 # thresh attempt counter 
+        while (len(corners) == 0):  
+            if i > 3: 
+                 return self._raw.copy()
+            print("i = %d"%(i))
+            self.updateScales(self._raw.copy(),i)
+            self.updateContour()
+            self.updateCorners()
+            corners = self._corners
+            i+=1
 
         dest,w,h = destinationPoints(corners)
         R = homography(self._raw,np.float32(corners),dest)
-        self.updateScales(R)
+        #self.updateScales(R,i)
         return R[0:h,0:w]
         #TODO add cropping utility to alignImg method 
 
@@ -76,10 +111,11 @@ class Img:
             buffer = 20*linWeight
             r1 = (r1[0]-buffer,r1[1]-buffer)
             r2 = (r2[0]+buffer,r2[1]+buffer)
-            cv2.rectangle(temp,r1,r2,(255,0,0),-1)
-            cv2.rectangle(self._dewarped,r1,r2,(255,255,255),-1)
+            cv2.rectangle(temp,r1,r2,(255,255,255),-1)
             cv2.putText(temp,text,(X,Y),font,fontScale,(0,0,255),linWeight+2)
-            cv2.putText(self._dewarped,text,(X,Y),font,fontScale,(0,0,255),linWeight+2)
+            #cv2.rectangle(self._dewarped,r1,r2,(255,255,255),-1)
+            #cv2.putText(self._dewarped,text,(X,Y),font,fontScale,(0,0,255),linWeight+2)
+          
 
         else: 
             corners = np.int_(self._corners)
