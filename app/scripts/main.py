@@ -28,7 +28,7 @@ import cv2
 import threading
 
 
-
+#TODO investegate pixel loss in pdf output
 
 def convert(img,imgpath,dest): 
     try: 
@@ -41,10 +41,11 @@ def convert(img,imgpath,dest):
             os.mkdir(savepath)
         worker = threading.Thread(target=image.saveAll,args=(savepath,))
         worker.start()
+        worker.join()
         f = open(dest+basename+'.pdf',"wb+")
         f.write(image.getPdf())
         f.close()
-        #worker.join()
+       
         
         return 0
     except IOError as e: 
