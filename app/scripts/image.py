@@ -63,8 +63,7 @@ class Img:
    
         if len(corners) == 0: 
             print("refining")
-            for cnt in self._contours[1]:
-                cnt = remove_defects(cnt)
+            cnt = remove_defects(self._contours[0],self._contours[1][0])
             self.updateCorners()
        
         try:

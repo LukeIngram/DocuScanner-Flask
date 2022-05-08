@@ -48,10 +48,11 @@ def remove_from_contour(contour, defectsIdx):
     return out
 
 
-def remove_defects(contour):
-    hull = cv2.convexHull(contour, returnPoints=False)
+def remove_defects(canvas,contour):
+    hull = cv2.convexHull(contour,returnPoints=False)
     defects = cv2.convexityDefects(contour, hull)
-
+    temp = np.zeros(canvas.shape,np.uint8)
+    cv2.drawContours(temp,contour,-1,(0,0,255),10)
     while True:
         defectsIdx = []
         for i in range(defects.shape[0]):
@@ -62,10 +63,20 @@ def remove_defects(contour):
             depth = d / 256
             if depth > 2:
                 defectsIdx.append(f)
-        if len(defectsIdx) < 1:
+        if len(defectsIdx) < 2:
             break
         contour = remove_from_contour(contour, defectsIdx)
         hull = cv2.convexHull(contour, returnPoints=False)
+        #cv2.drawContours(temp,hull,-1,(0,255,0),10)
         defects = cv2.convexityDefects(contour, hull)
-    
-    return contour
+    cv2.drawContours(canvas,contour,-1,(255,255,255),10)
+    cv2.drawContours(temp,contour,-1,(0,255,0),10)
+    cv2.imwrite('debug.jpg',temp)
+    return canvas,contour
+
+
+#TODO
+# Alternate method, Hough Transform and extract promient lines
+
+def clean_contour(canva,cnt): 
+    pass 

@@ -8,7 +8,7 @@ def detectContour(img,img_shape):
     canvas = np.zeros(img_shape,np.uint8)
     contours,hierarchy = cv2.findContours(img,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
     cnt = sorted(contours,key=cv2.contourArea,reverse=True)
-    #remove small contours
+    #remove small contours (less than 30% of image area) 
     cnt = [c for c in cnt if cv2.contourArea(c) >=  (0.25 * (canvas.shape[0] * canvas.shape[1]))]
     return canvas,cnt 
 
