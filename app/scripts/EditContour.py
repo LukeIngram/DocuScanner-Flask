@@ -10,6 +10,7 @@ import sys
 def ed2(lhs, rhs):
     return(lhs[0] - rhs[0])*(lhs[0] - rhs[0]) + (lhs[1] - rhs[1])*(lhs[1] - rhs[1])
 
+#TODO DEBUG THIS
 
 def remove_from_contour(contour, defectsIdx):
     minDist = sys.maxsize
