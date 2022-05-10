@@ -13,7 +13,7 @@ class Img:
         self._raw = data
         self._name = name
         self._gray = self.clahe(self.set_grayscale(self._raw.copy()))
-        self._thresh = self.denoise(self.threshImg(self._gray))
+        self._thresh = self.threshImg(self.set_grayscale(self.HN_Edge_Detection(self.denoise(self._raw.copy()))))
         self._contours = detectContour(self._thresh,self._thresh.shape)
         self._corners = detectCorners(self._contours[0],self._contours[1])
         self._dewarped = self.alignImg()
@@ -21,6 +21,15 @@ class Img:
 
 
     #-----BEGIN PREPROCESSING------
+
+    def HN_Edge_Detection(self,data): 
+        blob = cv2.dnn.blobFromImage(data.copy(),scalefactor=0.5,size=(data.shape[0],data.shape[1]),swapRB=False,crop=False)
+        net = cv2.dnn.readNetFromCaffe("scripts/model/deploy.prototxt","scripts/model/hed_pretrained_bsds.caffemodel")
+        net.setInput(blob)
+        hed = net.forward()
+        hed = cv2.resize(hed[0,0],(data.shape[0],data.shape[1]))
+        hed = (255 * hed).astype("uint8")
+        return cv2.cvtColor(data,cv2.COLOR_RGB2BGR)
 
     def clahe(self,data): 
         cl = cv2.createCLAHE(clipLimit=2.0,tileGridSize=(8,8))
@@ -61,10 +70,10 @@ class Img:
     def alignImg(self):
         corners = self._corners
    
-        if len(corners) == 0: 
-            print("refining")
-            cnt = remove_defects(self._contours[0],self._contours[1][0])
-            self.updateCorners()
+        #if len(corners) == 0: 
+          #  print("refining")
+           # cnt = remove_defects(self._contours[0],self._contours[1][0])
+           # self.updateCorners()
        
         try:
             dest,w,h = destinationPoints(corners)

@@ -12,7 +12,8 @@ TODO
 ## Quickstart Guide
 TODO 
 
-
+### Setting up Caffe
+TODO
 
 
 
@@ -22,6 +23,8 @@ TODO
 
 ### Contributors
 
+
+##
 
 
 ### Works Cited 

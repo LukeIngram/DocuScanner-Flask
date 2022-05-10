@@ -27,7 +27,7 @@ from scripts.image import Img
 import cv2
 import threading
 
-
+#TODO MAJOR ISSUE WITH HED MODEL EXCEEDING 15GB OF RAM FOR LARGE IMAGES
 #TODO investegate pixel loss in pdf output
 
 def convert(img,imgpath,dest): 
