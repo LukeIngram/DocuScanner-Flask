@@ -4,6 +4,7 @@ import numpy as np
 import cv2
 import pytesseract as tess
 from scripts.align import *
+import concurrent.futures as cf 
 
 
 class Img: 
@@ -12,13 +13,25 @@ class Img:
         self._name = name
         self._scaled = scaleImg(self._raw.copy())
         self._gray = self.denoise(self.clahe(self.set_grayscale(self._scaled)))
-        self._thresh = self.threshImg(self.set_grayscale(self.HN_Edge_Detection(self._scaled)))
+        self._thresh = self.threshImg(self.edge_detection(self._scaled))
         self._contours = detectContour(self._thresh,self._thresh.shape)
         self._corners = detectCorners(self._contours[0],self._contours[1])
         self._dewarped = self.alignImg()
         self._annotated = self.identifyDocument()
 
     #-----BEGIN PREPROCESSING------
+
+    def edge_detection(self,data): #TODO two-pronged edge detection method (Optimize if possible)
+        canvas = np.zeros(data.shape,np.uint8)
+        with cf.ThreadPoolExecutor() as executor: 
+            worker = executor.submit(self.HN_Edge_Detection,data.copy())
+            cntsC = detectContour(self.threshImg(self._gray),data.shape)[1]
+            cntsH = detectContour(self.threshImg(worker.result()),data.shape)[1]
+        
+        cv2.drawContours(canvas,cntsH,-1,(255,255,255),1)
+        cv2.drawContours(canvas,cntsC,-1,(255,255,255),1)
+        
+        return cv2.cvtColor(canvas,cv2.COLOR_BGR2GRAY)
 
     def HN_Edge_Detection(self,data): #TODO debug black screen output. 
        # data = data[:,:,:3]
@@ -29,8 +42,8 @@ class Img:
         temp = np.zeros(data.shape,np.uint8)
         hed = cv2.resize(hed[0,0],(data.shape[1],data.shape[0])) # Might be cuprite in black screen output issue
         hed = (200*hed).astype("uint8")
-        cv2.imwrite('temp.jpg',hed)
-        return cv2.cvtColor(hed,cv2.COLOR_RGBA2BGR)
+        cv2.imwrite('temp.jpg',cv2.cvtColor(hed,cv2.COLOR_RGB2BGR))
+        return cv2.cvtColor(cv2.cvtColor(hed,cv2.COLOR_RGBA2BGR),cv2.COLOR_BGR2GRAY)
 
     def clahe(self,data): 
         cl = cv2.createCLAHE(clipLimit=2.0,tileGridSize=(8,8))
@@ -52,16 +65,6 @@ class Img:
         temp = cv2.addWeighted(data.copy(), 1.5, temp, -0.5, 0)
         temp = cv2.threshold(temp,0,255,cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
         return temp
-
-    def updateScales(self,data): #UNUSED
-        self._gray = self.set_grayscale(data)
-        self._thresh = self.threshImg(self._gray)
-        
-    def updateContour(self): #UNSUED
-        self._contours = detectContour(self._thresh,self._thresh.shape)
-
-    def updateCorners(self): #UNUSED
-        self._corners = detectCorners(self._contours[0],self._contours[1])
 
     def alignImg(self):
         H,W = self._raw.shape[:2]

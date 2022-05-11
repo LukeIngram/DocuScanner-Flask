@@ -9,7 +9,9 @@ def detectContour(img,img_shape):
     contours,hierarchy = cv2.findContours(img,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
     cnt = sorted(contours,key=cv2.contourArea,reverse=True)
     #remove small contours (less than 30% of image area) 
-    cnt = [c for c in cnt if cv2.contourArea(c) >=  (0.3 * (canvas.shape[0] * canvas.shape[1]))]
+    cnt = [c for c in cnt if cv2.contourArea(c) >=  (0.25 * (canvas.shape[0] * canvas.shape[1]))]
+    for i in range(0,len(cnt)):
+        cv2.drawContours(canvas,cnt,i,(255,255,255),3)
     return canvas,cnt 
 
 
@@ -17,7 +19,6 @@ def detectContour(img,img_shape):
 def detectCorners(canvas,contours): #Utilizes the Douglas-Peuckert Algorithm
     points = []
     for cnt in contours: #taking the largest rectangular contour
-        cv2.drawContours(canvas,cnt,-1,(255,255,255),3)
         ep = 0.01 * cv2.arcLength(cnt,True) 
         appx_corners = cv2.approxPolyDP(cnt,ep,True)
         if len(appx_corners) == 4: 
