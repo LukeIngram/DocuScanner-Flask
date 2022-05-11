@@ -11,7 +11,7 @@ class Img:
     def __init__(self,name,data): 
         self._raw = data
         self._name = name
-        self._scaled = scaleImg(self._raw.copy())
+        self._scaled = scaleImg(self._raw)
         self._gray = self.denoise(self.clahe(self.set_grayscale(self._scaled)))
         self._thresh = self.threshImg(self.edge_detection(self._scaled))
         self._contours = detectContour(self._thresh,self._thresh.shape)
@@ -33,16 +33,15 @@ class Img:
         
         return cv2.cvtColor(canvas,cv2.COLOR_BGR2GRAY)
 
-    def HN_Edge_Detection(self,data): #TODO debug black screen output. 
-       # data = data[:,:,:3]
+    def HN_Edge_Detection(self,data):
         blob = cv2.dnn.blobFromImage(data,scalefactor=1,size=(data.shape[0],data.shape[1]),swapRB=True)
         net = cv2.dnn.readNetFromCaffe("scripts/model/deploy.prototxt","scripts/model/hed_pretrained_bsds.caffemodel")
         net.setInput(blob)
         hed = net.forward()
         temp = np.zeros(data.shape,np.uint8)
-        hed = cv2.resize(hed[0,0],(data.shape[1],data.shape[0])) # Might be cuprite in black screen output issue
+        hed = cv2.resize(hed[0,0],(data.shape[1],data.shape[0])) 
         hed = (200*hed).astype("uint8")
-        cv2.imwrite('temp.jpg',cv2.cvtColor(hed,cv2.COLOR_RGB2BGR))
+        #cv2.imwrite('temp.jpg',cv2.cvtColor(hed,cv2.COLOR_RGB2BGR))
         return cv2.cvtColor(cv2.cvtColor(hed,cv2.COLOR_RGBA2BGR),cv2.COLOR_BGR2GRAY)
 
     def clahe(self,data): 

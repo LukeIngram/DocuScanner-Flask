@@ -18,11 +18,10 @@ def detectContour(img,img_shape):
 
 def detectCorners(canvas,contours): #Utilizes the Douglas-Peuckert Algorithm
     points = []
-    for cnt in contours: #taking the largest rectangular contour
+    for cnt in contours: 
         ep = 0.01 * cv2.arcLength(cnt,True) 
         appx_corners = cv2.approxPolyDP(cnt,ep,True)
         if len(appx_corners) == 4: 
-            #cv2.drawContours(canvas,appx_corners,-1,(0,255,0),10)
             appx_corners = sorted(np.concatenate(appx_corners).tolist())
             appx_corners = np.array(appx_corners,dtype="float32")
             #re-order the corners for 4-point transform algorithm
@@ -35,7 +34,7 @@ def detectCorners(canvas,contours): #Utilizes the Douglas-Peuckert Algorithm
             rect[3] = appx_corners[np.argmax(diff)]
             points = rect
             print(points)
-            break # break at first 4-sided polygonal contour 
+            break # break at first(largest) 4-sided polygonal contour 
     return points
 
 
@@ -70,11 +69,20 @@ def get_optimal_font_scale(text, width):
 #TODO algo for optimal image size for HED RAM saving 
 def scaleImg(img): 
     h,w = img.shape[:2]
+    ledge = h if h >= w else w 
+    if ledge > 1000: 
+        sfact = 1000/ledge 
+        
+
+    else: 
+        temp = img.copy()
     
-    return img #----------------------------REMOVE
+    return temp
 
 
 #TODO calculate computed scaled points to correct place in original image.
-def scalePoints(orignal,scaled,pts):
-    dest_pts = pts  #-----------------------------------REMOVE
-    return dest_pts
+def scalePoints(orignal,scaled,srcPts,destPts):
+
+    scaled_dest = destPts #---------------------CHANGE
+    scaled_src = srcPts #-----------------------CHANGE 
+    return scaled_src,scaled_dest
