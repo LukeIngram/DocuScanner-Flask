@@ -8,7 +8,7 @@ input_dim: 500
 
 layer { bottom: 'data' top: 'conv1_1' name: 'conv1_1' type: "Convolution"
   param { lr_mult: 1 decay_mult: 1 } param { lr_mult: 2 decay_mult: 0}
-  convolution_param { engine: CAFFE num_output: 64 pad: 35 kernel_size: 3 } }
+  convolution_param { engine: CAFFE num_output: 64 pad: 1 kernel_size: 3 } }
 layer { bottom: 'conv1_1' top: 'conv1_1' name: 'relu1_1' type: "ReLU" }
 layer { bottom: 'conv1_1' top: 'conv1_2' name: 'conv1_2' type: "Convolution"
   param { lr_mult: 1 decay_mult: 1 } param { lr_mult: 2 decay_mult: 0}

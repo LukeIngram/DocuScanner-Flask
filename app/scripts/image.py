@@ -21,13 +21,16 @@ class Img:
     #-----BEGIN PREPROCESSING------
 
     def HN_Edge_Detection(self,data): #TODO debug black screen output. 
-        blob = cv2.dnn.blobFromImage(data,scalefactor=1,size=(data.shape[0],data.shape[1]),swapRB=True,crop=False)
+       # data = data[:,:,:3]
+        blob = cv2.dnn.blobFromImage(data,scalefactor=1,size=(data.shape[0],data.shape[1]),swapRB=True)
         net = cv2.dnn.readNetFromCaffe("scripts/model/deploy.prototxt","scripts/model/hed_pretrained_bsds.caffemodel")
         net.setInput(blob)
         hed = net.forward()
-       # hed = cv2.resize(hed[0,0],(data.shape[0],data.shape[1])) # Might be cuprite in black screen output issue
-        hed = (255 * hed).astype("uint8")
-        return cv2.cvtColor(hed,cv2.COLOR_RGB2BGR)
+        temp = np.zeros(data.shape,np.uint8)
+        hed = cv2.resize(hed[0,0],(data.shape[1],data.shape[0])) # Might be cuprite in black screen output issue
+        hed = (200*hed).astype("uint8")
+        cv2.imwrite('temp.jpg',hed)
+        return cv2.cvtColor(hed,cv2.COLOR_RGBA2BGR)
 
     def clahe(self,data): 
         cl = cv2.createCLAHE(clipLimit=2.0,tileGridSize=(8,8))

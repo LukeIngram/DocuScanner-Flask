@@ -9,7 +9,7 @@ def detectContour(img,img_shape):
     contours,hierarchy = cv2.findContours(img,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
     cnt = sorted(contours,key=cv2.contourArea,reverse=True)
     #remove small contours (less than 30% of image area) 
-    cnt = [c for c in cnt if cv2.contourArea(c) >=  (0.25 * (canvas.shape[0] * canvas.shape[1]))]
+    cnt = [c for c in cnt if cv2.contourArea(c) >=  (0.3 * (canvas.shape[0] * canvas.shape[1]))]
     return canvas,cnt 
 
 
@@ -21,7 +21,7 @@ def detectCorners(canvas,contours): #Utilizes the Douglas-Peuckert Algorithm
         ep = 0.01 * cv2.arcLength(cnt,True) 
         appx_corners = cv2.approxPolyDP(cnt,ep,True)
         if len(appx_corners) == 4: 
-            cv2.drawContours(canvas,appx_corners,-1,(0,255,0),10)
+            #cv2.drawContours(canvas,appx_corners,-1,(0,255,0),10)
             appx_corners = sorted(np.concatenate(appx_corners).tolist())
             appx_corners = np.array(appx_corners,dtype="float32")
             #re-order the corners for 4-point transform algorithm
