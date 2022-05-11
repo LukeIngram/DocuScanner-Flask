@@ -12,16 +12,10 @@ def detectContour(img,img_shape):
     cnt = [c for c in cnt if cv2.contourArea(c) >=  (0.25 * (canvas.shape[0] * canvas.shape[1]))]
     return canvas,cnt 
 
-#TODO add "draw the lightest rectangular contour that takes up atelast 20% of the total area checking"
-# to the detect contour function
 
-#TODO add contour repair though opencv hulling
-# refer to https://stackoverflow.com/questions/35226993/how-to-crop-away-convexity-defects
-# https://docs.opencv.org/3.4/d7/d1d/tutorial_hull.html 
 
 def detectCorners(canvas,contours): #Utilizes the Douglas-Peuckert Algorithm
     points = []
-    
     for cnt in contours: #taking the largest rectangular contour
         cv2.drawContours(canvas,cnt,-1,(255,255,255),3)
         ep = 0.01 * cv2.arcLength(cnt,True) 
@@ -43,27 +37,25 @@ def detectCorners(canvas,contours): #Utilizes the Douglas-Peuckert Algorithm
             break # break at first 4-sided polygonal contour 
     return points
 
+
 # Based off four-point-transform:  
 # https://github.com/meizhoubao/pyimagesearch/tree/master/getperspectivetransform
 def destinationPoints(corners): 
     (tl, tr, br, bl) = corners
-
     x1 = np.sqrt(((br[0] - bl[0]) ** 2) + ((br[1] - bl[1]) ** 2))
     x2 = np.sqrt(((tr[0] - tl[0]) ** 2) + ((tr[1] - tl[1]) ** 2))
     x = max(int(x1),int(x2))
-
     y1 = np.sqrt(((tr[0] - br[0]) ** 2) + ((tr[1] - br[1]) ** 2))
     y2 = np.sqrt(((tr[0] - br[0]) ** 2) + ((tr[1] - br[1]) ** 2))
     y = max(int(y1),int(y2))
-    
     dest_corners = np.array([[0,0],[x-1,0],[x-1,y-1],[0,y-1]],dtype="float32")
     return dest_corners,x,y
+
 
 def homography(img,src,dest): 
     h,w = img.shape[:2]
     H, _ = cv2.findHomography(src,dest,method=cv2.RANSAC,ransacReprojThreshold=0.1)
     return cv2.warpPerspective(img,H,(w,h),flags=cv2.INTER_LINEAR)
-
 
 
 def get_optimal_font_scale(text, width):
@@ -74,4 +66,14 @@ def get_optimal_font_scale(text, width):
           return scale/10
     return 1
 
-#TODO algo for optimal thresh block and constant size
+#TODO algo for optimal image size for HED RAM saving 
+def scaleImg(img): 
+    h,w = img.shape[:2]
+    
+    return img #----------------------------REMOVE
+
+
+#TODO calculate computed scaled points to correct place in original image.
+def scalePoints(orignal,scaled,pts):
+    dest_pts = pts  #-----------------------------------REMOVE
+    return dest_pts

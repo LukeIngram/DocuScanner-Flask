@@ -4,32 +4,30 @@ import numpy as np
 import cv2
 import pytesseract as tess
 from scripts.align import *
-from scripts.EditContour import remove_defects
-import threading
 
 
 class Img: 
     def __init__(self,name,data): 
         self._raw = data
         self._name = name
-        self._gray = self.clahe(self.set_grayscale(self._raw.copy()))
-        self._thresh = self.threshImg(self.set_grayscale(self.HN_Edge_Detection(self.denoise(self._raw.copy()))))
+        self._scaled = scaleImg(self._raw.copy())
+        self._gray = self.denoise(self.clahe(self.set_grayscale(self._scaled)))
+        self._thresh = self.threshImg(self.set_grayscale(self.HN_Edge_Detection(self._scaled)))
         self._contours = detectContour(self._thresh,self._thresh.shape)
         self._corners = detectCorners(self._contours[0],self._contours[1])
         self._dewarped = self.alignImg()
         self._annotated = self.identifyDocument()
 
-
     #-----BEGIN PREPROCESSING------
 
-    def HN_Edge_Detection(self,data): 
-        blob = cv2.dnn.blobFromImage(data.copy(),scalefactor=0.5,size=(data.shape[0],data.shape[1]),swapRB=False,crop=False)
+    def HN_Edge_Detection(self,data): #TODO debug black screen output. 
+        blob = cv2.dnn.blobFromImage(data,scalefactor=1,size=(data.shape[0],data.shape[1]),swapRB=True,crop=False)
         net = cv2.dnn.readNetFromCaffe("scripts/model/deploy.prototxt","scripts/model/hed_pretrained_bsds.caffemodel")
         net.setInput(blob)
         hed = net.forward()
-        hed = cv2.resize(hed[0,0],(data.shape[0],data.shape[1]))
+       # hed = cv2.resize(hed[0,0],(data.shape[0],data.shape[1])) # Might be cuprite in black screen output issue
         hed = (255 * hed).astype("uint8")
-        return cv2.cvtColor(data,cv2.COLOR_RGB2BGR)
+        return cv2.cvtColor(hed,cv2.COLOR_RGB2BGR)
 
     def clahe(self,data): 
         cl = cv2.createCLAHE(clipLimit=2.0,tileGridSize=(8,8))
@@ -39,7 +37,7 @@ class Img:
         kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5,5))
         return cv2.erode(data.copy(),kernel)
 
-    def dialate(self,data): 
+    def dialate(self,data): #UNUSED  
         temp = cv2.dilate(data.copy(),None,iterations=4)
         return temp
 
@@ -52,46 +50,35 @@ class Img:
         temp = cv2.threshold(temp,0,255,cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
         return temp
 
-
-    def updateScales(self,data): 
+    def updateScales(self,data): #UNUSED
         self._gray = self.set_grayscale(data)
         self._thresh = self.threshImg(self._gray)
         
-
-    def updateContour(self): 
+    def updateContour(self): #UNSUED
         self._contours = detectContour(self._thresh,self._thresh.shape)
 
-
-    def updateCorners(self): 
+    def updateCorners(self): #UNUSED
         self._corners = detectCorners(self._contours[0],self._contours[1])
 
-
-    #TODO implement method to try alternate threshing if square contour is not found. 
     def alignImg(self):
-        corners = self._corners
-   
-        #if len(corners) == 0: 
-          #  print("refining")
-           # cnt = remove_defects(self._contours[0],self._contours[1][0])
-           # self.updateCorners()
-       
+        H,W = self._raw.shape[:2]
+        scaledH,scaledW = self._scaled[:2] 
         try:
+            corners = self._corners
             dest,w,h = destinationPoints(corners)
+            dest = scalePoints((H,W),(scaledH,scaledW),dest)
             R = homography(self._raw,np.float32(corners),dest)
-            self.updateScales(R)
             return R[0:h,0:w]
         except ValueError: 
             return self._raw.copy()
         #TODO add cropping utility to alignImg method 
 
-
     #-----END PREPROCESSING---------
 
     #-----BEGIN DISPLAY METHODS---------
 
-    #draw boxes around pre-processed image
-    def identifyDocument(self): #TODO draw bounding rect around rectangular document
-        temp = self._raw.copy()
+    def identifyDocument(self):  #draw boxes around pre-processed image
+        temp = self._scaled.copy()
         font = cv2.FONT_HERSHEY_SIMPLEX
         linWeight = 3
         if (temp.shape[0]*temp.shape[1]) < 1000**2: 
@@ -110,10 +97,7 @@ class Img:
             r2 = (r2[0]+buffer,r2[1]+buffer)
             cv2.rectangle(temp,r1,r2,(255,255,255),-1)
             cv2.putText(temp,text,(X,Y),font,fontScale,(0,0,255),linWeight+2)
-            #cv2.rectangle(self._dewarped,r1,r2,(255,255,255),-1)
-            #cv2.putText(self._dewarped,text,(X,Y),font,fontScale,(0,0,255),linWeight+2)
           
-
         else: 
             corners = np.int_(self._corners)
             text = 'Document'
@@ -122,10 +106,8 @@ class Img:
             cv2.line(temp,tuple(corners[0]),tuple(corners[3]),(0,255,0),linWeight*3)
             cv2.line(temp,tuple(corners[2]),tuple(corners[3]),(0,255,0),linWeight*3)
             cv2.line(temp,tuple(corners[2]),tuple(corners[1]),(0,255,0),linWeight*3)
-            cv2.putText(temp,text,(corners[3][0]+(10*linWeight),corners[3][1]+(20*linWeight))\
-                                                ,font,fontScale,(0,255,0),linWeight)
+            cv2.putText(temp,text,(corners[3][0]+(10*linWeight),corners[3][1]+(20*linWeight)),font,fontScale,(0,255,0),linWeight)
         return temp 
-
 
     #-----END DISPLAY METHODS------------
 
@@ -136,8 +118,6 @@ class Img:
         cv2.imwrite(dir + '/annotated' + '.jpeg',self._annotated)
         cv2.imwrite(dir + '/dewarped' + '.jpeg',self._dewarped)
         
-
-
     def getPdf(self): 
         temp = cv2.cvtColor(self._dewarped,cv2.COLOR_BGR2RGB)
         pdf = tess.image_to_pdf_or_hocr(temp,extension='pdf')

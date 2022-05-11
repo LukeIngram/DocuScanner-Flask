@@ -27,7 +27,11 @@ from scripts.image import Img
 import cv2
 import threading
 
-#TODO MAJOR ISSUE WITH HED MODEL EXCEEDING 15GB OF RAM FOR LARGE IMAGES
+#TODO MAJOR ISSUE WITH HED MODEL EXCEEDING 15GB OF RAM FOR LARGE IMAGES 
+# Possible fix dynamic image scaling? (implement algo to scale down image, calculate the points, and then estimate those 
+# same points on the original sized image)
+
+
 #TODO investegate pixel loss in pdf output
 
 def convert(img,imgpath,dest): 
@@ -45,8 +49,6 @@ def convert(img,imgpath,dest):
         f = open(dest+basename+'.pdf',"wb+")
         f.write(image.getPdf())
         f.close()
-       
-        
         return 0
     except IOError as e: 
         print(e)
