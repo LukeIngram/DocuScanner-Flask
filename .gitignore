@@ -136,6 +136,8 @@ dmypy.json
 app/keys
 
 #testing
-app/uploads/*
-app/outbox/ 
-app/img/*
+app/img/dewarp*
+app/outbox/dewarp*
+app/uploads/dewarp*
+app/runTest.py
+

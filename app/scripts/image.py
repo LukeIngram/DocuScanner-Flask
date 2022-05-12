@@ -12,21 +12,21 @@ class Img:
         self._raw = data
         self._name = name
         self._scaled = scaleImg(self._raw)
-        self._gray = self.denoise(self.clahe(self.set_grayscale(self._scaled)))
-        self._thresh = self.threshImg(self.edge_detection(self._scaled))
-        self._contours = detectContour(self._thresh,self._thresh.shape)
+        self._gray = self.clahe(self.set_grayscale(self._scaled))
+        self._thresh = self.threshImg(self.edge_detection(self._scaled,0.30))
+        self._contours = detectContour(self._thresh,self._thresh.shape,0.30)
         self._corners = detectCorners(self._contours[0],self._contours[1])
         self._dewarped = self.alignImg()
         self._annotated = self.identifyDocument()
 
     #-----BEGIN PREPROCESSING------
 
-    def edge_detection(self,data): #TODO two-pronged edge detection method (Optimize if possible)
+    def edge_detection(self,data,tolerance):
         canvas = np.zeros(data.shape,np.uint8)
         with cf.ThreadPoolExecutor() as executor: 
             worker = executor.submit(self.HN_Edge_Detection,data.copy())
-            cntsC = detectContour(self.threshImg(self._gray),data.shape)[1]
-            cntsH = detectContour(self.threshImg(worker.result()),data.shape)[1]
+            cntsC = detectContour(self.threshImg(self._gray),data.shape,tolerance)[1]
+            cntsH = detectContour(self.threshImg(worker.result()),data.shape,tolerance)[1]
         
         cv2.drawContours(canvas,cntsH,-1,(255,255,255),1)
         cv2.drawContours(canvas,cntsC,-1,(255,255,255),1)
@@ -38,10 +38,8 @@ class Img:
         net = cv2.dnn.readNetFromCaffe("scripts/model/deploy.prototxt","scripts/model/hed_pretrained_bsds.caffemodel")
         net.setInput(blob)
         hed = net.forward()
-        temp = np.zeros(data.shape,np.uint8)
         hed = cv2.resize(hed[0,0],(data.shape[1],data.shape[0])) 
         hed = (200*hed).astype("uint8")
-        #cv2.imwrite('temp.jpg',cv2.cvtColor(hed,cv2.COLOR_RGB2BGR))
         return cv2.cvtColor(cv2.cvtColor(hed,cv2.COLOR_RGBA2BGR),cv2.COLOR_BGR2GRAY)
 
     def clahe(self,data): 
@@ -65,15 +63,32 @@ class Img:
         temp = cv2.threshold(temp,0,255,cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
         return temp 
 
+    def updateThresh(self,tolerance):
+        self._thresh = self.threshImg(self.edge_detection(self._scaled,tolerance))
+    
+    def updateCorners(self,tolerance): 
+        self._contours = detectContour(self._thresh,self._thresh.shape,tolerance)
+        self._corners = detectCorners(self._contours[0],self._contours[1])
+
+
     def alignImg(self):
         H,W = self._raw.shape[:2]
         scaledH,scaledW = self._scaled.shape[:2] 
+        corners = self._corners
+            
+        cnt = 1
+        while len(corners) == 0 and cnt < 3:
+            t = 0.25-(0.05*cnt)
+            self.updateThresh(t)
+            self.updateCorners(t)
+            corners = self._corners
+            cnt += 1
+
         try:
-            corners =scalePoints((H,W),(scaledH,scaledW),self._corners)
-            dest,w,h = destinationPoints(corners)
+            s_corners = scalePoints((H,W),(scaledH,scaledW),corners)
+            dest,w,h = destinationPoints(s_corners)
             print(dest)
-            #cv2.line(temp,tuple(corners[0]),tuple(corners[1]),(0,255,0),linWeight*3)
-            R = homography(self._raw,np.float32(corners),dest)
+            R = homography(self._raw,np.float32(s_corners),dest)
             return R[0:h,0:w]
         except ValueError: 
             print("RAISE")
@@ -103,7 +118,7 @@ class Img:
             r1 = (r1[0]-buffer,r1[1]-buffer)
             r2 = (r2[0]+buffer,r2[1]+buffer)
             cv2.rectangle(temp,r1,r2,(255,255,255),-1)
-            cv2.putText(temp,text,(X,Y),font,fontScale,(0,0,255),linWeight+2)
+            cv2.putText(temp,text,(X,Y),font,fontScale,(0,0,255),linWeight)
           
         else: 
             corners = np.int_(self._corners)

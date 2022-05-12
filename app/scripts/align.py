@@ -4,12 +4,12 @@ import numpy as np
 import cv2
 
 
-def detectContour(img,img_shape): 
+def detectContour(img,img_shape,tolerance): 
     canvas = np.zeros(img_shape,np.uint8)
     contours,hierarchy = cv2.findContours(img,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
     cnt = sorted(contours,key=cv2.contourArea,reverse=True)
     #remove small contours (less than 30% of image area) 
-    cnt = [c for c in cnt if cv2.contourArea(c) >=  (0.25 * (canvas.shape[0] * canvas.shape[1]))]
+    cnt = [c for c in cnt if cv2.contourArea(c) >=  (tolerance * (canvas.shape[0] * canvas.shape[1]))]
     cv2.drawContours(canvas,cnt,-1,(255,255,255),3)
     return canvas,cnt 
 
@@ -66,7 +66,7 @@ def get_optimal_font_scale(text, width):
           return scale/10
     return 1
 
-#TODO algo for optimal image size for HED RAM saving 
+
 def scaleImg(img): 
     h,w = img.shape[:2]
     ledge = h if h >= w else w 
@@ -78,9 +78,7 @@ def scaleImg(img):
     return temp
 
 
-#TODO calculate computed scaled points to correct place in original image.
 def scalePoints(origin,scaled,pts):
-    print("scaled: {}".format(pts))
     if origin == scaled: 
         scaled_pts = pts
     else:
@@ -88,6 +86,4 @@ def scalePoints(origin,scaled,pts):
         S_ledge = scaled[0] if scaled[0] >= scaled[1] else scaled[1] 
         sfact = O_ledge/S_ledge
         scaled_pts = np.multiply(pts,sfact)
-
-    print("restored: {}".format(scaled_pts))
     return scaled_pts

@@ -27,10 +27,6 @@ from scripts.image import Img
 import cv2
 import threading
 
-#TODO MAJOR ISSUE WITH HED MODEL EXCEEDING 15GB OF RAM FOR LARGE IMAGES 
-# Possible fix dynamic image scaling? (implement algo to scale down image, calculate the points, and then estimate those 
-# same points on the original sized image)
-
 
 #TODO investegate pixel loss in pdf output
 
@@ -40,7 +36,7 @@ def convert(img,imgpath,dest):
             dest += '/'
         basename = os.path.splitext(os.path.basename(imgpath))[0]
         image = Img(basename,img)
-        savepath = "img/" + basename
+        savepath = "img/dewarp/" + basename
         if not os.path.isdir(savepath):
             os.mkdir(savepath)
         worker = threading.Thread(target=image.saveAll,args=(savepath,))
@@ -57,7 +53,7 @@ def convert(img,imgpath,dest):
 
 def main(imgpath,dest): 
     (stauts,msg) = (-1,"unknown error")
-    if os.path.splitext(imgpath)[1] not in {".jpeg",".png",".jpg",".tiff",".tif"}:
+    if os.path.splitext(imgpath)[1] not in {".jpeg",".png",".jpg",".tiff",".tif",".JPG"}:
         (status,msg) = (-1,"unsupported file format")
     elif not os.path.isdir(dest): 
         (status,msg) = (-1,"destination directory not found")
