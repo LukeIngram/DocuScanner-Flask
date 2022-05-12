@@ -61,20 +61,22 @@ class Img:
 
     def threshImg(self,data): 
         temp = cv2.GaussianBlur(data.copy(),(5,5),0)
-        temp = cv2.addWeighted(data.copy(), 1.5, temp, -0.5, 0)
+        #temp = cv2.addWeighted(data.copy(), 1.5, temp, -0.5, 0)
         temp = cv2.threshold(temp,0,255,cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
-        return temp
+        return temp 
 
     def alignImg(self):
         H,W = self._raw.shape[:2]
-        scaledH,scaledW = self._scaled[:2] 
+        scaledH,scaledW = self._scaled.shape[:2] 
         try:
-            corners = self._corners
+            corners =scalePoints((H,W),(scaledH,scaledW),self._corners)
             dest,w,h = destinationPoints(corners)
-            dest = scalePoints((H,W),(scaledH,scaledW),dest)
+            print(dest)
+            #cv2.line(temp,tuple(corners[0]),tuple(corners[1]),(0,255,0),linWeight*3)
             R = homography(self._raw,np.float32(corners),dest)
             return R[0:h,0:w]
         except ValueError: 
+            print("RAISE")
             return self._raw.copy()
         #TODO add cropping utility to alignImg method 
 

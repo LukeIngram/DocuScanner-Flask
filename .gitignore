@@ -134,3 +134,8 @@ dmypy.json
 
 # Flask
 app/keys
+
+#testing
+app/uploads/*
+app/outbox/ 
+app/img/*

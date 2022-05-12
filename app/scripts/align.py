@@ -10,8 +10,7 @@ def detectContour(img,img_shape):
     cnt = sorted(contours,key=cv2.contourArea,reverse=True)
     #remove small contours (less than 30% of image area) 
     cnt = [c for c in cnt if cv2.contourArea(c) >=  (0.25 * (canvas.shape[0] * canvas.shape[1]))]
-    for i in range(0,len(cnt)):
-        cv2.drawContours(canvas,cnt,i,(255,255,255),3)
+    cv2.drawContours(canvas,cnt,-1,(255,255,255),3)
     return canvas,cnt 
 
 
@@ -49,6 +48,7 @@ def destinationPoints(corners):
     y2 = np.sqrt(((tr[0] - br[0]) ** 2) + ((tr[1] - br[1]) ** 2))
     y = max(int(y1),int(y2))
     dest_corners = np.array([[0,0],[x-1,0],[x-1,y-1],[0,y-1]],dtype="float32")
+    print(x,y)
     return dest_corners,x,y
 
 
@@ -71,18 +71,23 @@ def scaleImg(img):
     h,w = img.shape[:2]
     ledge = h if h >= w else w 
     if ledge > 1000: 
-        sfact = 1000/ledge 
-        
-
+        sfact = 1000/ledge
+        temp = cv2.resize(img.copy(),(int(sfact*w),int(sfact*h)))
     else: 
         temp = img.copy()
-    
     return temp
 
 
 #TODO calculate computed scaled points to correct place in original image.
-def scalePoints(orignal,scaled,srcPts,destPts):
+def scalePoints(origin,scaled,pts):
+    print("scaled: {}".format(pts))
+    if origin == scaled: 
+        scaled_pts = pts
+    else:
+        O_ledge = origin[0] if origin[0] >= origin[1] else origin[1]
+        S_ledge = scaled[0] if scaled[0] >= scaled[1] else scaled[1] 
+        sfact = O_ledge/S_ledge
+        scaled_pts = np.multiply(pts,sfact)
 
-    scaled_dest = destPts #---------------------CHANGE
-    scaled_src = srcPts #-----------------------CHANGE 
-    return scaled_src,scaled_dest
+    print("restored: {}".format(scaled_pts))
+    return scaled_pts
