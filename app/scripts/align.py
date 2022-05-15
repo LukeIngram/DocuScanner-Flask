@@ -32,7 +32,6 @@ def detectCorners(canvas,contours): #Utilizes the Douglas-Peuckert Algorithm
             rect[1] = appx_corners[np.argmin(diff)]
             rect[3] = appx_corners[np.argmax(diff)]
             points = rect
-            print(points)
             break # break at first(largest) 4-sided polygonal contour 
     return points
 
@@ -48,7 +47,6 @@ def destinationPoints(corners):
     y2 = np.sqrt(((tr[0] - br[0]) ** 2) + ((tr[1] - br[1]) ** 2))
     y = max(int(y1),int(y2))
     dest_corners = np.array([[0,0],[x-1,0],[x-1,y-1],[0,y-1]],dtype="float32")
-    print(x,y)
     return dest_corners,x,y
 
 

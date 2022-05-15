@@ -65,7 +65,7 @@ def upload_file():
 
 def convertImg(filename): 
     if os.path.exists(filename):
-        if converter.main(filename,app.config["OUTBOX_PATH"])[0] == 0:
+        if converter.main(filename,app.config["OUTBOX_PATH"],True)[0] == 0:
             
             return os.path.splitext(os.path.basename(filename))[0] + '.pdf'
     return None

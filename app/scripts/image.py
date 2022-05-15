@@ -76,23 +76,19 @@ class Img:
         scaledH,scaledW = self._scaled.shape[:2] 
         corners = self._corners
             
-        cnt = 1
-        while len(corners) == 0 and cnt < 3:
-            t = 0.25-(0.05*cnt)
+        if len(corners) == 0:       
+            t = 0.10
             self.updateThresh(t)
             self.updateCorners(t)
             corners = self._corners
-            cnt += 1
 
         try:
             s_corners = scalePoints((H,W),(scaledH,scaledW),corners)
             dest,w,h = destinationPoints(s_corners)
-            print(dest)
             R = homography(self._raw,np.float32(s_corners),dest)
             return R[0:h,0:w]
         except ValueError: 
-            print("RAISE")
-            return self._raw.copy()
+            raise IOError
         #TODO add cropping utility to alignImg method 
 
     #-----END PREPROCESSING---------
