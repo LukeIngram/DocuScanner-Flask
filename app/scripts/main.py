@@ -62,7 +62,7 @@ def main(imgpath,dest,save):
     else:
         img = cv2.imread(imgpath)
         if img.size == 0: 
-            (status,msg) = (-1,"unable to open specified file")
+            (status,msg) = (1,"unable to open specified file")
         else: 
             if convert(img,imgpath,dest,save) < 0:
                 (status,msg) = (1,"unable to create pdf")
