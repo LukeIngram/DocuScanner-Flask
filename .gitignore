@@ -134,3 +134,10 @@ dmypy.json
 
 # Flask
 app/keys
+
+#testing
+app/img/dewarp*
+app/outbox/dewarp*
+app/uploads/dewarp*
+app/runTest.py
+

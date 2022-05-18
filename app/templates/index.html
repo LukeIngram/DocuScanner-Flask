@@ -7,8 +7,8 @@
 </head>
 <body bgcolor="#ffffff">
 
-<center>
-<h1>Sorry! This Page is Currently Under Development</h1></center>
+	
+<center><h1>Sorry! This Page is Currently Under Development</h1></center>
 
 <center>
 
@@ -17,13 +17,14 @@
 <p style="color: blue">
 	{% with messages = get_flashed_messages() %}
 	{% if messages %}
+	<ul style="list-style:none;">
 	   {% for message in messages %}
-		  {{ message }}
+		<li>{{ message }}</li>
 	   {% endfor %}
+	</ul>
 	{% endif %}
  {% endwith %} 
 </p>
-
 
 
 <form  method="post" action="" enctype="multipart/form-data">
@@ -31,14 +32,40 @@
 		<input type="file" name="file" required>
 		<input type="submit" value="Submit">
 </form>
-<p>
 
+
+<script src="https://code.jquery.com/jquery-3.5.1.js"
+integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+crossorigin="anonymous"></script>
+
+<script type="text/javascript">
+$(document).on('submit','#todo-form',function(e)
+		 {
+console.log('hello');
+e.preventDefault();
+$.ajax({
+type:'POST',
+url:'/',
+data:{
+todo:$("#todo").val()
+},
+success:function()
+{
+alert('saved');
+}
+})
+});
+</script>
+
+{% if file %}
 	<div>
-		<img src="{{ url_for('display',filename=file) }}">
+		<img src="{{ url_for('display_image', filename=file) }}">
 	</div>
-</p>
+{% endif %}
 <hr width="100%">
-<font size="-1">Last updated Apr. '22</font>
+<font size="-1">Last updated May. 2022</font>
 
 </body>
+
+</center>
 </html>

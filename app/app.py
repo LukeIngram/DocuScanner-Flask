@@ -35,7 +35,7 @@ app.config.from_pyfile('keys/config.py')
 
 
 
-@app.route("/")
+@app.route("/",methods=['GET'])
 def index(): 
     return render_template("index.html")
 
@@ -65,8 +65,7 @@ def upload_file():
 
 def convertImg(filename): 
     if os.path.exists(filename):
-        if converter.main(filename,app.config["OUTBOX_PATH"])[0] == 0:
-            
+        if converter.main(filename,app.config["OUTBOX_PATH"],True)[0] == 0:
             return os.path.splitext(os.path.basename(filename))[0] + '.pdf'
     return None
 
@@ -79,10 +78,7 @@ def download(filename):
 
 @app.route("/display/<filename>")
 def display(filename): 
-    try:
-       return send_from_directory(app.config['UPLOAD_PATH'],filename)
-    except FileNotFoundError:
-        abort(500)
+    return redirect(url_for('static', filename='uploads/' + filename), code=301)
 
 
 if __name__ == "__main__": 
