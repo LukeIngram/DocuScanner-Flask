@@ -34,7 +34,6 @@ app = Flask(__name__)
 app.config.from_pyfile('keys/config.py')
 
 
-
 @app.route("/",methods=['GET'])
 def index(): 
     return render_template("index.html")
@@ -54,7 +53,6 @@ def upload_file():
         fpath = os.path.join(app.config["UPLOAD_PATH"],fname)
         file.save(fpath)
         flash("File Successfully Uploaded. Evaluating your submission...")
-
         sterilize_img(fpath)
         flash("\nConverting you image now. Your Download will Begin Shortly.")
         outgoing = convertImg(fpath)
