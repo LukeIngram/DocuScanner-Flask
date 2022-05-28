@@ -136,6 +136,7 @@ class Img:
         cv2.imwrite(dir + '/annotated' + '.jpeg',self._annotated)
         cv2.imwrite(dir + '/dewarped' + '.jpeg',self._dewarped)
         
+        #Switch Tesseract to alternative package
     def getPdf(self): 
         temp = cv2.cvtColor(self._dewarped,cv2.COLOR_BGR2RGB)
         pdf = tess.image_to_pdf_or_hocr(temp,extension='pdf')
