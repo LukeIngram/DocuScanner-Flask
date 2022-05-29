@@ -39,6 +39,11 @@ def index():
     return render_template("index.html")
 
 
+@app.route("/css/<filename>",methods=['GET'])
+def styles(filename):
+    return url_for('static', filename=filename)
+    
+
 @app.route("/",methods=['POST'])
 def upload_file():
     if 'file' not in request.files:
@@ -59,7 +64,7 @@ def upload_file():
         if outgoing == None: 
             flash("\nConversion Unsuccessful. Please Try a Different File.")
             return redirect(url_for('index'))
-    return redirect(url_for('download',filename=outgoing))
+    return render_template("index.html")#redirect(url_for('download',filename=outgoing))
 
 def convertImg(filename): 
     if os.path.exists(filename):
@@ -77,6 +82,8 @@ def download(filename):
 @app.route("/display/<filename>")
 def display(filename): 
     return redirect(url_for('static', filename='uploads/' + filename), code=301)
+
+
 
 
 if __name__ == "__main__": 
