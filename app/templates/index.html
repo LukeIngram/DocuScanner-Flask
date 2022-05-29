@@ -1,71 +1,62 @@
 <!DOCTYPE html >
+<html lang="en">
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
 	<meta http-equiv="content-language" content="en-us">
 	<meta name="author" content="not me">
+	<link rel="stylesheet" href="{{ url_for('static', filename='stylesheet.css') }}">
   <title>Oops!</title>
 </head>
-<body bgcolor="#ffffff">
-
-	
-<center><h1>Sorry! This Page is Currently Under Development</h1></center>
-
-<center>
-
-<h2>Check our <a href="https://github.com/LukeIngram/img-to-pdf-converter-webapp">Github</a> for Progress Updates </h2>
-
-<p style="color: blue">
-	{% with messages = get_flashed_messages() %}
-	{% if messages %}
-	<ul style="list-style:none;">
-	   {% for message in messages %}
-		<li>{{ message }}</li>
-	   {% endfor %}
-	</ul>
-	{% endif %}
- {% endwith %} 
-</p>
-
-
-<form  method="post" action="" enctype="multipart/form-data">
-	  Select image to upload:
-		<input type="file" name="file" required>
-		<input type="submit" value="Submit">
-</form>
-
-
-<script src="https://code.jquery.com/jquery-3.5.1.js"
-integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
-crossorigin="anonymous"></script>
-
-<script type="text/javascript">
-$(document).on('submit','#todo-form',function(e)
-		 {
-console.log('hello');
-e.preventDefault();
-$.ajax({
-type:'POST',
-url:'/',
-data:{
-todo:$("#todo").val()
-},
-success:function()
-{
-alert('saved');
-}
-})
-});
-</script>
-
-{% if file %}
-	<div>
-		<img src="{{ url_for('display_image', filename=file) }}">
+<body>
+	<div class="fullBox">
+		<header>
+			<h1>Sorry! This Page is Currently Under Development</h1>
+			<h2>Check our <a href="https://github.com/LukeIngram/img-to-pdf-converter-webapp">Github</a> for Progress Updates </h2>
+		</header> 
+		<main>
+			<div class="main__instructions">
+				<p>This is placeholder text for the instructions.</p>
+			</div>
+			<div class="main__imageOutput">
+				<img src="placeholder.png" />
+			</div>
+			<div class="main__buttonRow">
+				<p style="color: blue">
+					{% with messages = get_flashed_messages() %}
+					{% if messages %}
+					<ul style="list-style:none;">
+					   {% for message in messages %}
+						<li>{{ message }}</li>
+					   {% endfor %}
+					</ul>
+					{% endif %}
+				 {% endwith %} 
+				</p>
+				
+				
+				
+				{% if file %}
+					<div>
+						<img src="{{ url_for('display_image', filename=file) }}">
+					</div>
+				{% endif %}
+				<hr width="100%">
+				<p>Last updated May. 2022</p>
+				<div class="main__uploadButton"></div>
+					<form  method="post" action="" enctype="multipart/form-data">
+					Select image to upload:
+					  <input type="file" name="file" required>
+					  <input type="submit" value="Submit">
+			  		</form>
+				<div class="main__submitButton"></div>
+			</div>
+		</main> 
+		<footer>
+			<h2>&#169; Luke Ingram & Paul DiGerolamo</h2>
+			<h3>Luke Ingram: Backend programming</h3>
+			<h3>Paul DiGerolamo: Frontend design</h3>
+		</footer> 
 	</div>
-{% endif %}
-<hr width="100%">
-<font size="-1">Last updated May. 2022</font>
 
 </body>
-
-</center>
 </html>
