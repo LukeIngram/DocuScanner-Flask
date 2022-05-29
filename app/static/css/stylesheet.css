@@ -1,0 +1,12 @@
+header{
+    text-align: center;
+}
+main{
+    border: solid 2px black;
+    border-radius: 1rem;
+    text-align: center;
+}
+footer{
+    text-align: center;
+}
+

@@ -4,13 +4,14 @@
 	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
 	<meta http-equiv="content-language" content="en-us">
 	<meta name="author" content="not me">
-	<link rel="stylesheet" href="{{ url_for('static', filename='stylesheet.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/normalize') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/stylesheet.css') }}">
   <title>Oops!</title>
 </head>
 <body>
 	<div class="fullBox">
 		<header>
-			<h1>Sorry! This Page is Currently Under Development</h1>
+			<h1>Sorry! This Page is Currently Under Development.</h1>
 			<h2>Check our <a href="https://github.com/LukeIngram/img-to-pdf-converter-webapp">Github</a> for Progress Updates </h2>
 		</header> 
 		<main>
@@ -18,7 +19,7 @@
 				<p>This is placeholder text for the instructions.</p>
 			</div>
 			<div class="main__imageOutput">
-				<img src="placeholder.png" />
+				<img src="{{ url_for('static', filename='placeholder.jpg') }}" />
 			</div>
 			<div class="main__buttonRow">
 				<p style="color: blue">
