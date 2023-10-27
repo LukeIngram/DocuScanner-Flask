@@ -1,12 +1,11 @@
-#   Image Class: Image.py
+# image.py
 
 import numpy as np 
 import cv2
-import pytesseract as tess
-from scripts.align import *
+from app.backend.utils.transforms import *
 import concurrent.futures as cf 
 
-
+# TODO REDO THIS
 class Img: 
     def __init__(self,name,data): 
         self._raw = data
@@ -127,6 +126,8 @@ class Img:
             cv2.putText(temp,text,(corners[3][0]+(10*linWeight),corners[3][1]+(20*linWeight)),font,fontScale,(0,255,0),linWeight)
         return temp 
 
+
+#TODO ARE THESE NEEDED 
     #-----END DISPLAY METHODS------------
 
     def saveAll(self,dir):

@@ -1,37 +1,19 @@
-#   MIT License
-#
-#   Copyright (c) 2022 Luke Ingram
-#   
-#   Permission is hereby granted, free of charge, to any person obtaining a copy
-#   of this software and associated documentation files (the "Software"), to deal
-#   in the Software without restriction, including without limitation the rights
-#   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-#   copies of the Software, and to permit persons to whom the Software is
-#   furnished to do so, subject to the following conditions:
-#   
-#   The above copyright notice and this permission notice shall be included in all
-#   copies or substantial portions of the Software.
-#   
-#   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-#   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-#   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-#   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-#   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-#   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-#   SOFTWARE.
-#   
-#   app.py
+# app.py 
 
-from flask import Flask, render_template,request,redirect,url_for,abort,send_from_directory,flash
+import os
 from werkzeug.utils import secure_filename 
-import os 
-from scripts.verify import *
+from flask import Flask, render_template, request,redirect, url_for, abort, send_from_directory, flash
+
+from app.backend.utils.verify import *
 import scripts.main as converter
-from pathlib import Path
+import backend
 
 
+# Define Persistent
 app = Flask(__name__)
 app.config.from_pyfile('keys/config.py')
+
+Scanner = backend.Scanner(app.config[''])
 
 
 @app.route("/",methods=['GET'])
@@ -63,7 +45,7 @@ def upload_file():
 
 def convertImg(filename): 
     if os.path.exists(filename):
-        if converter.main(filename,app.config["OUTBOX_PATH"],True)[0] == 0:
+        if converter.main(filename,app.config["OUTBOX_PATH"], True)[0] == 0:
             return os.path.splitext(os.path.basename(filename))[0] + '.pdf'
     return None
 
