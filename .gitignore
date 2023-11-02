@@ -141,3 +141,7 @@ app/outbox/dewarp*
 app/uploads/dewarp*
 app/runTest.py
 
+
+# future 
+rotating_calipers.py
+

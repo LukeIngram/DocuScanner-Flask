@@ -7,18 +7,16 @@ from typing import Dict, Any, Tuple, List
 import torchvision.transforms as vt
 
 
+
 def detectContours(img: np.ndarray, img_shape: Tuple[int, ...], tol: float = 0.3) -> List[np.ndarray]: 
+
     """
     TODO DOCSTRING
     """
+
     img = cv2.blur(img, (3,3))
-    canvas = np.zeros(img_shape, np.uint8)
     contours, _ = cv2.findContours(img, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
     cnt = sorted(contours, key=cv2.contourArea, reverse=True)
-
-    # Remove small contours (less than 30% of image area) #TODO 
-    cv2.drawContours(canvas, contours, -1, (255, 255, 255), 3)
-    cnt = [c for c in cnt if cv2.contourArea(c) >=  (tol * (canvas.shape[0] * canvas.shape[1]))]
 
     return cnt 
 
@@ -29,28 +27,33 @@ def detectCorners(contours: List[np.ndarray]) -> np.ndarray:
     TODO DOCSTRING
     """
     points = []
-    for cnt in contours:
-        ep = 0.01 * cv2.arcLength(cnt, True) 
-        appx_corners = cv2.approxPolyDP(cnt, ep, True)
-       
-        if len(appx_corners) == 4: 
-            appx_corners = np.concatenate(appx_corners).tolist()
-            appx_corners = np.array(appx_corners, dtype="float32")
-        
-            #re-order the corners for 4-point transform algorithm
-            rect = np.zeros((4, 2), dtype="float32") 
-            s = appx_corners.sum(axis=1)
-            rect[0] = appx_corners[np.argmin(s)]
-            rect[2] = appx_corners[np.argmax(s)]
-            diff = np.diff(appx_corners, axis=1)
-            rect[1] = appx_corners[np.argmin(diff)]
-            rect[3] = appx_corners[np.argmax(diff)] 
-            points = rect
-            break # break at first(largest) quadrilateral contour 
+
+    cnt = max(contours, key=cv2.contourArea)
+
+    ep = 0.02 * cv2.arcLength(cnt, True) 
+
+    appx_corners = cv2.approxPolyDP(cnt, ep, True)
+    appx_corners = np.concatenate(appx_corners).tolist()
+    appx_corners = np.array(appx_corners, dtype="float32")
+
+    if (appx_corners.shape[0] > 4) and (appx_corners.shape[0] < 11): 
+        pass # TODO QUADRILATERAL APPROXIMATION
+
+    #re-order the corners for 4-point transform algorithm
+    if appx_corners.shape[0] == 4:
+        rect = np.zeros((4, 2), dtype="float32") 
+        s = appx_corners.sum(axis=1)
+        rect[0] = appx_corners[np.argmin(s)]
+        rect[2] = appx_corners[np.argmax(s)]
+        diff = np.diff(appx_corners, axis=1)
+        rect[1] = appx_corners[np.argmin(diff)]
+        rect[3] = appx_corners[np.argmax(diff)] 
+        points = rect
+        #  break # break at first(largest) quadrilateral contour 
     
     """
     # DEBUG 
-
+    print(len(points))
     import matplotlib.pyplot as plt 
     canvas = np.zeros((480, 480),np.uint8)
     cv2.drawContours(canvas, contours, -1, (255, 255, 255), 3)

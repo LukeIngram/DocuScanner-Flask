@@ -4,7 +4,7 @@ import cv2
 import threading
 
 
-#TODO investegate pixel loss in pdf output
+#TODO investigate pixel loss in pdf output
 
 def convert(img,imgpath,dest,save): 
     try: 

@@ -2,15 +2,21 @@
 # Class Definition for scanner object 
 
 import os 
+import io 
 import cv2
 import numpy as np
 from typing import Dict, Any, List, Tuple
+
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 import torch
 import torch.nn as nn
 
 from .models import *
 from .utils import transforms, ModelError
+
 
 """ TODO: 
 -> DOCSTRINGS
@@ -19,10 +25,11 @@ from .utils import transforms, ModelError
 
 
 class Scanner(): 
+
     """TODO DOCSTRING"""
 
     def __init__(self, 
-                model_fname: str, 
+                model_fpath: str, 
                 device: str = 'cpu', 
                 supported_size: Tuple[int, int] = (480, 480),
                 cropBuffer: int = 1  
@@ -36,15 +43,16 @@ class Scanner():
         except RuntimeError: 
             self.device = torch.device('cpu')
 
-        self.model = self.__build_model(model_fname) 
+        self.model = self.__build_model(model_fpath) 
       
     
-    def __build_model(self, model_fname: str) -> nn.Module: 
+    def __build_model(self, model_fpath: str) -> nn.Module: 
+
         """
         TODO DOCSTRING
         """
         try: 
-            load = torch.load(os.path.join('models', 'saves', f'{model_fname}'), map_location=self.device)
+            load = torch.load(model_fpath, map_location=self.device)
             state_dict = load['state_dict']
 
             model = UNet(n_channels=3, 
@@ -96,9 +104,11 @@ class Scanner():
     
 
     def __getCorners(self, input: np.ndarray, sfacts: float) -> np.ndarray: 
+
         """
         TODO DOCSTRING 
         """
+
         try:
             # Find Corners & Scale TODO MEASURE TIME OF THIS
             contours = transforms.detectContours(input, input.shape, tol=0.1)
@@ -124,7 +134,7 @@ class Scanner():
             out = out[0:(crop_w + self.cropBuffer), 0:(crop_h + self.cropBuffer)]
 
         except (ValueError, AttributeError):
-            out = image 
+            out = None 
         
         return out
         
@@ -138,21 +148,11 @@ class Scanner():
         linWeight = int(np.ceil(sum(image.shape[:2])/2 * 0.003))
 
         if len(corners) > 0:
-            text = 'Document'
-            fontScale = transforms.get_optimal_font_scale(text, (corners[1][0]-corners[0][0])//4)
             cv2.line(canvas, (corners[0]), (corners[1]), (0, 255, 0), linWeight*3)
             cv2.line(canvas, (corners[0]), (corners[3]), (0, 255, 0), linWeight*3)
             cv2.line(canvas, (corners[2]), (corners[3]), (0, 255, 0), linWeight*3)
             cv2.line(canvas, (corners[2]), (corners[1]), (0, 255, 0), linWeight*3)
             
-            cv2.putText(img = canvas,
-                        text = text,
-                        org = (corners[3][0] + (10*linWeight), corners[3][1] + (20*linWeight)),
-                        fontFace = font,
-                        fontScale = fontScale,
-                        color = (0, 255, 0),
-                        thickness = linWeight
-            )
 
         else: 
             text = 'NO DOCUMENT DETECTED'
@@ -175,28 +175,32 @@ class Scanner():
         return canvas 
 
 
-    def scan(self, input: np.ndarray, verbose: bool = False) -> Dict[str, np.ndarray]:
+    def scan(self, input: np.ndarray, verbose: bool = False, tol: int = 50) -> Dict[str, np.ndarray]:
         """
         TODO DOCSTRING
         """
-        input = cv2.cvtColor(input, cv2.COLOR_BGR2RGB)
+
+        #input = cv2.cvtColor(input, cv2.COLOR_BGR2RGB)
         input_pr, sfact = self.__preprocess(input.copy())
         mask = self.__segment(input_pr)
+
 
         """
         import matplotlib.pyplot as plt 
         plt.imshow(mask)
         plt.show()
         """
-
+    
+    
         src_points = self.__getCorners(mask, sfact)
+        
         dewarped = self.__dewarp(input, src_points)
 
         if verbose:
             annotated = self.__annotate(input, src_points)
         else: 
-            annotated = np.zeros(input.shape)
-        
+            annotated = None
+    
         return { 
             'original': input,
             'dewarped': dewarped,
@@ -204,5 +208,35 @@ class Scanner():
         }
 
 
-    
+    def build_report(self, scan_data: Dict[str, np.ndarray]) -> np.ndarray: 
+        
+        """
+        TODO DOCSTRING 
+        """
+
+        # Build sample
+        fig, axes = plt.subplots(nrows=1, ncols=3)
+        axes[0].imshow(scan_data['original'])
+        axes[1].imshow(scan_data['annotated'])
+        axes[2].imshow(scan_data['dewarped'])
+        axes[0].axis('off')
+        axes[1].axis('off')
+        axes[2].axis('off')
+        fig.tight_layout()
+        
+        # Convert to Image
+        buf = io.BytesIO()
+        fig.savefig(buf, format='png', bbox_inches='tight', pad_inches=0)
+        buf.seek(0)
+        
+        array = np.asarray(bytearray(buf.read()), dtype=np.uint8)
+        out = cv2.cvtColor(cv2.imdecode(array, cv2.IMREAD_ANYCOLOR), cv2.COLOR_BGR2RGB)
+       
+        fig.clf()
+        buf.close()
+
+        return out
+
+        
+        
 

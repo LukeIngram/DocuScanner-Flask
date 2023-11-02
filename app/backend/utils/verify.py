@@ -4,19 +4,25 @@ import imghdr
 from PIL import Image
 
 
+def validate_image(stream, exten: str) -> str: 
 
-#TODO build magic number identification tool or find api? 
-def validate_image(stream,exten): 
+    """
+    TODO DOCSTRING
+    """
     header = stream.read(512)
-    stream.seek(0)
     format = imghdr.what(None,header)
     if not format: 
         return None
-    if format in ['jpg','jpeg','tiff','png']:
+    if format in ['jpg', 'jpeg', 'tiff', 'png']:
         return exten
 
 
-def sterilize_img(fpath): 
+def sterilize_img(fpath: str) -> None: 
+
+    """
+    TODO DOCSTRING
+    """
+
     #Strip EXIF Data from image
     img = Image.open(fpath)
     data = list(img.getdata())
@@ -24,4 +30,4 @@ def sterilize_img(fpath):
     image_without_exif.putdata(data)
     image_without_exif.save(fpath)
 
-    #TODO Further sterilization (as program currently only stops exif attacks)
+    
