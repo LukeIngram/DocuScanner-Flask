@@ -7,14 +7,6 @@
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/normalize') }}">
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/stylesheet.css') }}">
   <title>Oops!</title>
-  <style>
-	.responsive-iframe {
-		width: 100%; /* Full width */
-		height: 80vh; /* Adjusted to not occupy the full viewport height */
-		border: none; /* Optional: removes the default iframe border */
-	}
-  </style>	
-
 </head>
 <body>
 	<div class="fullBox">
@@ -64,14 +56,15 @@
 					<h2>Processed Input</h2>
 					{% if content_type == 'image' %}
 						<img src="{{ output_url }}" alt="Output Image" style="max-width: 100%; max-height: 100vh; height: auto; width: auto;"><br>
+						<a href="{{ output_url }}" download>
+							<button>Download</button>
+						</a>
 					{% elif content_type == 'pdf' %}
-						<iframe src="{{ output_url }}" class="responsive-iframe">
-							If your browser does not support pdfs, please download to view.
-						</iframe>
+						<a href="{{ output_url }}">
+							<button>Download PDF</button>
+						</a>
 					{% endif %}
-					<a href="{{ output_url }}" download>
-						<button>Download</button>
-					</a>
+					
 				{% endif %}
 			</div>
 		</main> 

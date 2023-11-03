@@ -129,7 +129,7 @@ class Scanner():
         TODO DOCSTRING      
         """
         try:
-            dest_points, crop_h, crop_w = transforms.destinationPoints(src_points)
+            dest_points, crop_h, crop_w = transforms.destinationPoints(src_points, self.cropBuffer)
             out = transforms.homography(image, src_points.astype(np.float32), (dest_points + self.cropBuffer))
             out = out[0:(crop_w + self.cropBuffer), 0:(crop_h + self.cropBuffer)]
 

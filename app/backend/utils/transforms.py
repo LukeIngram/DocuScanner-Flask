@@ -37,7 +37,8 @@ def detectCorners(contours: List[np.ndarray]) -> np.ndarray:
     appx_corners = np.array(appx_corners, dtype="float32")
 
     if (appx_corners.shape[0] > 4) and (appx_corners.shape[0] < 11): 
-        pass # TODO QUADRILATERAL APPROXIMATION
+        #appx_corners = minimum_bouning_quad(appx_corners)
+        pass
 
     #re-order the corners for 4-point transform algorithm
     if appx_corners.shape[0] == 4:
@@ -68,7 +69,7 @@ def detectCorners(contours: List[np.ndarray]) -> np.ndarray:
 
 # Based off four-point-transform:  
 # https://github.com/meizhoubao/pyimagesearch/tree/master/getperspectivetransform
-def destinationPoints(corners: np.ndarray) -> np.ndarray: 
+def destinationPoints(corners: np.ndarray, buffer: int = 1) -> np.ndarray: 
     """
     TODO DOCSTRING
     """
@@ -81,7 +82,7 @@ def destinationPoints(corners: np.ndarray) -> np.ndarray:
     y2 = np.sqrt(((tr[0] - br[0]) ** 2) + ((tr[1] - br[1]) ** 2))
     y = max(int(y1), int(y2))
 
-    dest_corners = np.array([[0, 0], [x-1, 0], [x-1, y-1],[0, y-1]], dtype="float32")
+    dest_corners = np.array([[0, 0], [x - buffer, 0], [x - buffer, y - buffer],[0, y - buffer]], dtype="float32")
 
     return dest_corners, x, y
 
