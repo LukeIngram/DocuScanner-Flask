@@ -6,6 +6,21 @@ from typing import Dict, Any, Tuple, List
 
 import torchvision.transforms as vt
 
+from .boundingQuad import find_bounding_quad
+
+
+
+def boundingQuad(points: np.ndarray) -> np.ndarray:
+
+    """
+    TODO DOCSTRING 
+    """
+
+    hull_points = cv2.convexHull(points)
+    bounding_quad = find_bounding_quad(hull_points.squeeze())
+
+    return bounding_quad
+
 
 
 def detectContours(img: np.ndarray, img_shape: Tuple[int, ...], tol: float = 0.3) -> List[np.ndarray]: 
@@ -21,7 +36,24 @@ def detectContours(img: np.ndarray, img_shape: Tuple[int, ...], tol: float = 0.3
     return cnt 
 
 
-def detectCorners(contours: List[np.ndarray]) -> np.ndarray:
+def approximateCorners(contour: np.ndarray, tol: float = 0.02) -> np.ndarray: 
+
+    """
+    TODO DOCSTRING
+    """
+
+    ep = tol * cv2.arcLength(contour, True) 
+
+    appx_corners = cv2.approxPolyDP(contour, ep, True)
+    appx_corners = np.concatenate(appx_corners).tolist()
+    appx_corners = np.array(appx_corners, dtype="float32")
+
+    return appx_corners
+
+
+
+
+def detectCorners(contours: List[np.ndarray], shape: Tuple[int, ...]) -> np.ndarray:
     # Utilizes the Douglas-Peuckert Algorithm
     """
     TODO DOCSTRING
@@ -29,16 +61,19 @@ def detectCorners(contours: List[np.ndarray]) -> np.ndarray:
     points = []
 
     cnt = max(contours, key=cv2.contourArea)
+    appx_corners = approximateCorners(cnt, 0.02)
 
-    ep = 0.02 * cv2.arcLength(cnt, True) 
+    print(appx_corners) #DEBUG 
+    print(len(appx_corners))
+   
+    # TODO HANDLE CASE WHERE CORNERS LIE AT EXTREME POINTS (IMAGE BOUNDARIES)
+    #if 
+        
 
-    appx_corners = cv2.approxPolyDP(cnt, ep, True)
-    appx_corners = np.concatenate(appx_corners).tolist()
-    appx_corners = np.array(appx_corners, dtype="float32")
-
-    if (appx_corners.shape[0] > 4) and (appx_corners.shape[0] < 11): 
-        #appx_corners = minimum_bouning_quad(appx_corners)
-        pass
+    # Approximate bounding quadrilateral if needed
+    if 4 < appx_corners.shape[0] <= 11:
+        print("APPROXIMATING")
+        appx_corners = boundingQuad(appx_corners)
 
     #re-order the corners for 4-point transform algorithm
     if appx_corners.shape[0] == 4:
@@ -131,7 +166,7 @@ def scaleImg(img: np.ndarray, shape: Tuple[int, int]) -> Tuple[np.ndarray, np.nd
     return resized, np.array([w_sfact, h_sfact])
 
 
-def preprocess_transform(
+def preprocessTransform(
         mean: Tuple[float, ...] = (0.4611, 0.4359, 0.3905), 
         std: Tuple[float, ...] = (0.2193, 0.2150, 0.2109)
     ) -> vt.Compose: 

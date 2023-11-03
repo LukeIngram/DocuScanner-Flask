@@ -30,8 +30,8 @@ out = Scanner.scan(img, True)
 #cv2.destroyAllWindows()
 
 
-img = cv2.imread("/Users/luke/Documents/GitHub/DocuSegement-Pytorch/samples/imgs/IMG_5432.jpg")
-#img = cv2.imread("/Users/luke/Desktop/alt.jpg")
+#img = cv2.imread("/Users/luke/Documents/GitHub/DocuSegement-Pytorch/samples/imgs/IMG_5432.jpg")
+img = cv2.imread("/Users/luke/Desktop/binder.jpg")
 out = Scanner.scan(img, True)
 
 fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(10,5))

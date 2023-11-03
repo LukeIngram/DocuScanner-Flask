@@ -145,5 +145,4 @@ app/logs/*
 
 # future 
 rotating_calipers.py
-boundingQuad.py
 

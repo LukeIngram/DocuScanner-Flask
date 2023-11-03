@@ -60,8 +60,13 @@ class FileHandler():
             img = Image.open(os.path.join(self.uploads_path, fname))
         except FileNotFoundError as e: 
             raise(FileError(f"Unable to fetch {fname}: {e}"))
+        
+        img_arr = np.array(img)
 
-        return np.array(img)
+        if 3 > img_arr.shape[2] > 4: 
+            raise(FileError(f"Unsupported channel count '{img_arr.shape[2]}'"))
+
+        return img_arr
 
 
     def fetch_download(self, fname: str) -> str: 

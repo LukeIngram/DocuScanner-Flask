@@ -17,3 +17,4 @@ class FileError(Exception):
     def __init__(self, message="A file upload or download exception occured") -> None:
         self.messsage = message
         super().__init__(message)
+

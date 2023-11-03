@@ -78,14 +78,22 @@ class Scanner():
         
 
     def __preprocess(self, input: np.ndarray) -> Tuple[np.ndarray, float]: 
+        
+        """
+        TODO DOCSTRING
+        """
+         # Strip Alpha channel
+        input = input[:, :, :3]
+        
         resized, sfactrs = transforms.scaleImg(input, self.supported_size)
         data = resized.astype(np.float32)
-        data = transforms.preprocess_transform()(data)
+        data = transforms.preprocessTransform()(data)
 
         return data, sfactrs
         
 
     def __segment(self, input: torch.Tensor) -> np.ndarray: 
+       
         """
         TODO DOCSTRING
         """
@@ -112,7 +120,7 @@ class Scanner():
         try:
             # Find Corners & Scale TODO MEASURE TIME OF THIS
             contours = transforms.detectContours(input, input.shape, tol=0.1)
-            corners = transforms.detectCorners(contours)
+            corners = transforms.detectCorners(contours, input.shape)
 
             # Scale corners back to locations in original image
             corners_scaled = transforms.scalePoints(corners, tuple(1/s for s in sfacts))
@@ -123,6 +131,7 @@ class Scanner():
 
         return corners_scaled
     
+
 
     def __dewarp(self, image: np.ndarray, src_points: np.ndarray) -> np.ndarray:
         """
@@ -176,21 +185,19 @@ class Scanner():
 
 
     def scan(self, input: np.ndarray, verbose: bool = False, tol: int = 50) -> Dict[str, np.ndarray]:
+       
         """
         TODO DOCSTRING
         """
 
-        #input = cv2.cvtColor(input, cv2.COLOR_BGR2RGB)
         input_pr, sfact = self.__preprocess(input.copy())
         mask = self.__segment(input_pr)
 
-
-        """
+        
         import matplotlib.pyplot as plt 
         plt.imshow(mask)
         plt.show()
-        """
-    
+        
     
         src_points = self.__getCorners(mask, sfact)
         

@@ -60,6 +60,7 @@ def scan_input():
         flash(f"\nConversion Unsuccessful: {e}")
         return redirect(url_for('index'))
 
+
     scan_data = Scanner.scan(
         input=FileHandler.fetch_img(fname), 
         verbose=('verbose' in request.form),
