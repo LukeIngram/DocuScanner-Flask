@@ -38,7 +38,6 @@ EXT_2_TYPE = {
 
 
 
-
 @app.route("/",methods=['GET'])
 def index(): 
     return render_template("index.html")
@@ -89,8 +88,8 @@ def scan_input():
         else:
             report_url = request.args.get('serve_image', None)
 
-    output_type = EXT_2_TYPE.get(os.path.splitext(fname)[1])
-    return render_template('index.html', report_url=report_url, output_url=output_url, content_type=output_type)
+        output_type = EXT_2_TYPE.get(os.path.splitext(out_fname)[1])
+        return render_template('index.html', report_url=report_url, output_url=output_url, content_type=output_type)
    
 
 

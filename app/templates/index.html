@@ -7,12 +7,20 @@
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/normalize') }}">
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/stylesheet.css') }}">
   <title>Oops!</title>
+  <style>
+	.responsive-iframe {
+		width: 100%; /* Full width */
+		height: 80vh; /* Adjusted to not occupy the full viewport height */
+		border: none; /* Optional: removes the default iframe border */
+	}
+  </style>	
+
 </head>
 <body>
 	<div class="fullBox">
 		<header>
-			<h1>Sorry! This Page is Currently Under Development.</h1>
-			<h2>Check our <a href="https://github.com/LukeIngram/img-to-pdf-converter-webapp">Github</a> for Progress Updates </h2>
+			<h1>This Page is Currently Under Development.</h1>
+			<h2>Check the <a href="https://github.com/LukeIngram/img-to-pdf-converter-webapp">Github</a> for Progress Updates </h2>
 		</header> 
 		<main>
 			<div class="main__instructions">
@@ -33,6 +41,7 @@
 				
 				<hr width="100%">
 				<p>Last updated November, 2023</p>
+
 				<div class="main__uploadButton"></div> 
 					<form  method="post" action="" enctype="multipart/form-data">
 					Select image to upload:
@@ -45,6 +54,7 @@
 					  </label>
 					  <input type="submit" value="Upload">
 			  		</form>
+
 				<div class="main__submitButton"></div>
 				{% if report_url %}
 					<h2>Report Image</h2>
@@ -56,22 +66,21 @@
 					<h2>Processed Input</h2>
 					{% if content_type == 'image' %}
 						<img src="{{ output_url }}" alt="Output Image" style="max-width: 100%; max-height: 100vh; height: auto; width: auto;"><br>
-						<a href="{{ output_url }}" download>
-							<button>Download</button>
-						</a>
+
 					{% elif content_type == 'pdf' %}
-						<a href="{{ output_url }}">
-							<button>Download PDF</button>
-						</a>
+						<object data="{{ output_url }}" type="pdf" class="responsive-iframe">
+							<p><a href="{{ output_url }}"> View PDF</a></p>
+						</object>
 					{% endif %}
-					
+
+					<a href="{{ output_url }}" download>
+						<button>Download</button>
+					</a>
 				{% endif %}
 			</div>
 		</main> 
 		<footer>
-			<h2>&#169; Luke Ingram & Paul DiGerolamo</h2>
-			<h3>Luke Ingram: Backend programming</h3>
-			<h3>Paul DiGerolamo: Frontend design</h3>
+		ADD COPYRIGHT HERE
 		</footer> 
 	</div>
 
