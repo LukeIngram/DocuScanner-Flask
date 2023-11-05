@@ -62,9 +62,6 @@ def detectCorners(contours: List[np.ndarray], shape: Tuple[int, ...]) -> np.ndar
 
     cnt = max(contours, key=cv2.contourArea)
     appx_corners = approximateCorners(cnt, 0.02)
-
-    print(appx_corners) #DEBUG 
-    print(len(appx_corners))
    
     # TODO HANDLE CASE WHERE CORNERS LIE AT EXTREME POINTS (IMAGE BOUNDARIES)
     #if 
@@ -72,7 +69,6 @@ def detectCorners(contours: List[np.ndarray], shape: Tuple[int, ...]) -> np.ndar
 
     # Approximate bounding quadrilateral if needed
     if 4 < appx_corners.shape[0] <= 11:
-        print("APPROXIMATING")
         appx_corners = boundingQuad(appx_corners)
 
     #re-order the corners for 4-point transform algorithm

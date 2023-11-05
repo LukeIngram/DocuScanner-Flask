@@ -146,3 +146,6 @@ app/logs/*
 # future 
 rotating_calipers.py
 
+
+# Debug 
+debug_images

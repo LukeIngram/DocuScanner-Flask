@@ -62,7 +62,7 @@ def area_diff(points, i, j, consolidated):
     orig_area = cv2.contourArea(orig)
     new_area = cv2.contourArea(new)
 
-    return new_area - orig_area
+    return new_area
 
 
 def find_bounding_quad(points: np.ndarray) -> np.ndarray: 
@@ -86,8 +86,8 @@ def find_bounding_quad(points: np.ndarray) -> np.ndarray:
                 min_consolidated_point = consolidated_point
         
         new_points = np.vstack([points[:min_index[0]], min_consolidated_point, points[min_index[1]+1:]])
-
-        if new_points > points: 
+  
+        if len(new_points) > len(points): 
             raise(ValueError('Approximation Failed: are all corners visible?'))
         
         points = new_points

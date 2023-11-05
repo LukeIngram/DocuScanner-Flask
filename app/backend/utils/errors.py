@@ -18,3 +18,4 @@ class FileError(Exception):
         self.messsage = message
         super().__init__(message)
 
+

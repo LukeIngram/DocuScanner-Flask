@@ -193,12 +193,6 @@ class Scanner():
         input_pr, sfact = self.__preprocess(input.copy())
         mask = self.__segment(input_pr)
 
-        
-        import matplotlib.pyplot as plt 
-        plt.imshow(mask)
-        plt.show()
-        
-    
         src_points = self.__getCorners(mask, sfact)
         
         dewarped = self.__dewarp(input, src_points)
