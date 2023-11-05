@@ -1,71 +1,78 @@
-<!DOCTYPE html >
+<!DOCTYPE html>
+<html lang="en">
 <head>
-	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
-	<meta http-equiv="content-language" content="en-us">
-	<meta name="author" content="not me">
-  <title>Oops!</title>
-</head>
-<body bgcolor="#ffffff">
+    <meta charset="iso-8859-1">
+    <meta http-equiv="content-language" content="en-us">
+    <meta name="author" content="Luke Ingram">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/normalize.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/stylesheet.css') }}">
+    <title>DocuScanner</title>
+    <style>
+        .responsive-iframe {
+            width: 100%;
+            height: 80vh;
+            border: none;
+        }
+    </style>
+<body>
+    <div class="fullBox">
+        <header>
+            <h1>DocuScanner-Flask</h1>
+            <h2>Check the <a href="https://github.com/LukeIngram/DocuScanner-Flask">Github</a> for Progress Updates</h2>
+        </header>
+        <main>
+            <section class="main__instructions">
+                <p>Upload an image of your document below! Supported types are jpeg, png, & tiff. Please make sure the entire document is visible .</p>
+                <img src="static/report_fingers.jpg" alt="sample input/output" style="max-width: 100%; height: auto;">
+            </section>
+            <section class="main__buttonRow">
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        <ul class="messages" style="list-style:none; color: blue;">
+                            {% for message in messages %}
+                                <li>{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endwith %}
 
-	
-<center><h1>Sorry! This Page is Currently Under Development</h1></center>
+                <hr>
 
-<center>
+                <form method="post" action="" enctype="multipart/form-data">
+                    <p>Select image to upload:</p>
+                    <input type="file" name="file" required>
+                    <div>
+                        <label> Verbose
+                            <input type="checkbox" name="verbose" value="No">
+                        </label>
+                        <label> PDF
+                            <input type="checkbox" name="pdf" value="No">
+                        </label>
+                    </div>
+                    <input type="submit" value="Upload">
+                </form>
 
-<h2>Check our <a href="https://github.com/LukeIngram/img-to-pdf-converter-webapp">Github</a> for Progress Updates </h2>
+                {% if report_url %}
+                    <h2>Report Image</h2>
+                    <img src="{{ report_url }}" alt="Report Image">
+                {% endif %}
 
-<p style="color: blue">
-	{% with messages = get_flashed_messages() %}
-	{% if messages %}
-	<ul style="list-style:none;">
-	   {% for message in messages %}
-		<li>{{ message }}</li>
-	   {% endfor %}
-	</ul>
-	{% endif %}
- {% endwith %} 
-</p>
-
-
-<form  method="post" action="" enctype="multipart/form-data">
-	  Select image to upload:
-		<input type="file" name="file" required>
-		<input type="submit" value="Submit">
-</form>
-
-
-<script src="https://code.jquery.com/jquery-3.5.1.js"
-integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
-crossorigin="anonymous"></script>
-
-<script type="text/javascript">
-$(document).on('submit','#todo-form',function(e)
-		 {
-console.log('hello');
-e.preventDefault();
-$.ajax({
-type:'POST',
-url:'/',
-data:{
-todo:$("#todo").val()
-},
-success:function()
-{
-alert('saved');
-}
-})
-});
-</script>
-
-{% if file %}
-	<div>
-		<img src="{{ url_for('display_image', filename=file) }}">
-	</div>
-{% endif %}
-<hr width="100%">
-<font size="-1">Last updated May. 2022</font>
-
+                {% if output_url %}
+                    <h2>Processed Input</h2>
+                    {% if content_type == 'image' %}
+                        <img src="{{ output_url }}" alt="Output Image" style="max-width: 100%; height: auto;">
+                    {% elif content_type == 'pdf' %}
+                        <object data="{{ output_url }}" type="application/pdf" class="responsive-iframe"></object>
+                    {% endif %}
+                    <a href="{{ output_url }}" download>
+                        <button>Download</button>
+                    </a>
+                {% endif %}
+            </section>
+        </main>
+        <footer>
+            <p>Last updated November, 2023</p>
+        </footer>
+    </div>
 </body>
-
-</center>
 </html>

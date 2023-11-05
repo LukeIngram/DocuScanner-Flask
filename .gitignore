@@ -135,9 +135,17 @@ dmypy.json
 # Flask
 app/keys
 
-#testing
+# Internals
 app/img/dewarp*
-app/outbox/dewarp*
-app/uploads/dewarp*
-app/runTest.py
+app/outbox/*
+app/uploads/*
+app/test.py
+app/logs/*
 
+
+# future 
+rotating_calipers.py
+
+
+# Debug 
+debug_images
