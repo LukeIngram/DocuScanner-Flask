@@ -1,4 +1,4 @@
-# document-dewarping-flask-DL
+# DocuScanner Flask
 A Webapp designed with flask for online image to pdf conversion. with-built in Deep-Learning powered perspective correction. 
 
 
@@ -12,20 +12,10 @@ TODO
 ## Quickstart Guide
 TODO 
 
-### Setting up Caffe
-TODO
-
-
-
 
 ### How it All Works 
 TODO
 
-### Contributors
 
-
-##
-
-
-### Works Cited 
+### References
 TODO
