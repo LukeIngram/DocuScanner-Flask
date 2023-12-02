@@ -5,8 +5,8 @@ A Webapp designed with flask for online image to pdf conversion. with-built in D
 But follow the **Quickstart Guide** for setting this up on your system. 
 
 #### Featured Tech
-TODO
 
+Segmenttation model: [link](https://github.com/LukeIngram/DocuSegement-Pytorch)
 
 
 ## Quickstart Guide
