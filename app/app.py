@@ -2,14 +2,11 @@
 
 import os
 from typing import Dict, Any, Tuple
-from flask import Flask, render_template, request, redirect, url_for, abort, send_file, flash, session
 
-from PIL import Image
-import tempfile
+from flask import Flask, render_template, request, redirect, url_for, abort, send_file, flash, session
 
 from backend.Scanner import Scanner
 from backend.utils.errors import FileError
-
 from FileHandler import FileHandler
 
 

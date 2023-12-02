@@ -18,12 +18,6 @@ from .models import *
 from .utils import transforms, ModelError
 
 
-""" TODO: 
--> DOCSTRINGS
-
-"""
-
-
 class Scanner(): 
 
     """TODO DOCSTRING"""
@@ -108,6 +102,8 @@ class Scanner():
 
         # Create mask of [0, 255] from [0, 1]
         out = (logits.astype(np.uint8) * 255)
+
+        
         return out
     
 
@@ -134,9 +130,11 @@ class Scanner():
 
 
     def __dewarp(self, image: np.ndarray, src_points: np.ndarray) -> np.ndarray:
+        
         """
         TODO DOCSTRING      
         """
+
         try:
             dest_points, crop_h, crop_w = transforms.destinationPoints(src_points, self.cropBuffer)
             out = transforms.homography(image, src_points.astype(np.float32), (dest_points + self.cropBuffer))
@@ -149,9 +147,11 @@ class Scanner():
         
     
     def __annotate(self, image: np.ndarray, corners: np.ndarray) -> np.ndarray: 
+
         """
         TODO DOCSTRING
         """
+
         canvas = image.copy()
         font = cv2.FONT_HERSHEY_SIMPLEX
         linWeight = int(np.ceil(sum(image.shape[:2])/2 * 0.003))

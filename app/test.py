@@ -19,10 +19,10 @@ axes[1].imshow(out['annotated'])
 
 plt.show()
 """
-Scanner = Scanner("/Users/luke/Documents/GitHub/img-to-pdf-converter-webapp/app/backend/models/saves/unet_32.pth", 'mps')
+scanner = Scanner("/Users/luke/Documents/GitHub/img-to-pdf-converter-webapp/app/backend/models/saves/unet_32.pth", 'mps')
 
 img = cv2.imread("/Users/luke/Documents/GitHub/DocuSegement-Pytorch/samples/imgs/grocery.jpeg")
-out = Scanner.scan(img, True)
+out = scanner.scan(img, True)
 
 #report = Scanner.build_report(out)
 #cv2.imshow('Image Window', report)
@@ -31,13 +31,8 @@ out = Scanner.scan(img, True)
 
 
 #img = cv2.imread("/Users/luke/Documents/GitHub/DocuSegement-Pytorch/samples/imgs/IMG_5432.jpg")
-img = cv2.imread("/Users/luke/Desktop/binder.jpg")
-out = Scanner.scan(img, True)
+img = cv2.imread("/Users/luke/Desktop/IMG_5579 copy.jpg")
+out = scanner.scan(img, True)
 
-fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(10,5))
 
-axes[0].imshow(out['original'])
-#axes[2].imshow(out['dewarped'])
-axes[1].imshow(out['annotated'])
 
-plt.show()

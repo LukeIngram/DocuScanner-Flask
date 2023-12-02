@@ -22,7 +22,8 @@
         </header>
         <main>
             <section class="main__instructions">
-                <p>Upload an image of your document below! Supported types are jpeg, png, & tiff. Please make sure the entire document is visible .</p>
+                <p>Upload an image of your document below! Supported types are jpeg, png, & tiff.</p>
+                <p>For best results, please center your document within the image, making sure all corners are visible, and place against a dark or contrasting background. </p>
                 <img src="static/report_fingers.jpg" alt="sample input/output" style="max-width: 100%; height: auto;">
             </section>
             <section class="main__buttonRow">
@@ -41,15 +42,15 @@
                 <form method="post" action="" enctype="multipart/form-data">
                     <p>Select image to upload:</p>
                     <input type="file" name="file" required>
-                    <div>
                         <label> Verbose
                             <input type="checkbox" name="verbose" value="No">
                         </label>
                         <label> PDF
                             <input type="checkbox" name="pdf" value="No">
                         </label>
-                    </div>
+                    <div>
                     <input type="submit" value="Upload">
+                    </div>
                 </form>
 
                 {% if report_url %}
@@ -71,6 +72,7 @@
             </section>
         </main>
         <footer>
+            <p>&copy; 2023 Your Company Name</p>
             <p>Last updated November, 2023</p>
         </footer>
     </div>

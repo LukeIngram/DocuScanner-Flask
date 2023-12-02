@@ -9,7 +9,6 @@ import torchvision.transforms as vt
 from .boundingQuad import find_bounding_quad
 
 
-
 def boundingQuad(points: np.ndarray) -> np.ndarray:
 
     """
@@ -54,18 +53,17 @@ def approximateCorners(contour: np.ndarray, tol: float = 0.02) -> np.ndarray:
 
 
 def detectCorners(contours: List[np.ndarray], shape: Tuple[int, ...]) -> np.ndarray:
-    # Utilizes the Douglas-Peuckert Algorithm
+
     """
     TODO DOCSTRING
     """
+
     points = []
 
     cnt = max(contours, key=cv2.contourArea)
     appx_corners = approximateCorners(cnt, 0.02)
    
     # TODO HANDLE CASE WHERE CORNERS LIE AT EXTREME POINTS (IMAGE BOUNDARIES)
-    #if 
-        
 
     # Approximate bounding quadrilateral if needed
     if 4 < appx_corners.shape[0] <= 11:
@@ -81,19 +79,6 @@ def detectCorners(contours: List[np.ndarray], shape: Tuple[int, ...]) -> np.ndar
         rect[1] = appx_corners[np.argmin(diff)]
         rect[3] = appx_corners[np.argmax(diff)] 
         points = rect
-        #  break # break at first(largest) quadrilateral contour 
-    
-    """
-    # DEBUG 
-    print(len(points))
-    import matplotlib.pyplot as plt 
-    canvas = np.zeros((480, 480),np.uint8)
-    cv2.drawContours(canvas, contours, -1, (255, 255, 255), 3)
-    for point in points:
-        cv2.circle(canvas, tuple(point.astype(np.uint32)), 10, (255, 255, 255), -1)  # Mark corners in red
-    plt.imshow(canvas)
-    plt.show() 
-    """
 
     return points
     
