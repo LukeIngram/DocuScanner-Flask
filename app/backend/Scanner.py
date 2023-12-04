@@ -102,7 +102,6 @@ class Scanner():
 
         # Create mask of [0, 255] from [0, 1]
         out = (logits.astype(np.uint8) * 255)
-
         
         return out
     
@@ -134,7 +133,7 @@ class Scanner():
         """
         TODO DOCSTRING      
         """
-
+        
         try:
             dest_points, crop_h, crop_w = transforms.destinationPoints(src_points, self.cropBuffer)
             out = transforms.homography(image, src_points.astype(np.float32), (dest_points + self.cropBuffer))
