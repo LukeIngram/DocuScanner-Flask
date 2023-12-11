@@ -1,7 +1,6 @@
-![Python](https://img.shields.io/badge/python-3.x-blue.svg)
-![License](https://img.shields.io/github/license/LukeIngram/DocuScanner-Flask.svg)
-![Stars](https://img.shields.io/github/stars/LukeIngram/DocuScanner-Flask.svg)
-
+ <a href="https://www.python.org/"> <img src="https://img.shields.io/badge/python-v3.11+-blue.svg?logo=python&style=for-the-badge" /></a>
+ <a href='#'> <img src="https://img.shields.io/github/stars/LukeIngram/DocuScanner-Flask?style=for-the-badge" /> </a>
+ <a href='#'> <img src="https://img.shields.io/github/license/LukeIngram/DocuScanner-Flask?style=for-the-badge">
 
 # **DocuScanner Flask**
 
