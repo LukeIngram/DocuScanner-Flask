@@ -1,3 +1,6 @@
+![Python](https://img.shields.io/badge/python-3.x-blue.svg)
+![License](https://img.shields.io/github/license/LukeIngram/DocuScanner-Flask.svg)
+![Stars](https://img.shields.io/github/stars/LukeIngram/DocuScanner-Flask.svg)
 
 
 # **DocuScanner Flask**
