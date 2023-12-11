@@ -92,24 +92,28 @@ def destinationPoints(corners: np.ndarray, buffer: int = 1) -> np.ndarray:
     """
 
     (tl, tr, br, bl) = corners.astype(np.float32)
-    # Calculate the width and height of the original quadrilateral
+    # Calculate the width of the original quadrilateral
     width_top = np.sqrt(((tr[0] - tl[0]) ** 2) + ((tr[1] - tl[1]) ** 2))
     width_bottom = np.sqrt(((br[0] - bl[0]) ** 2) + ((br[1] - bl[1]) ** 2))
+    avg_width = (width_top + width_bottom) / 2
+
+    # Calculate the height of the original quadrilateral
     height_left = np.sqrt(((tl[0] - bl[0]) ** 2) + ((tl[1] - bl[1]) ** 2))
     height_right = np.sqrt(((tr[0] - br[0]) ** 2) + ((tr[1] - br[1]) ** 2))
+    avg_height = (height_left + height_right) / 2
 
-    # Take the maximum of the widths and heights to ensure a square
-    max_dimension = max(int(width_top), int(width_bottom), int(height_left), int(height_right))
+    # Define the destination rectangle with the computed width and height, minus the buffer
+    dest_width = int(avg_width) - buffer
+    dest_height = int(avg_height) - buffer
 
-    # Define the destination square with the computed size, minus the buffer
     dest_corners = np.array([
         [0, 0],
-        [max_dimension - buffer, 0],
-        [max_dimension - buffer, max_dimension - buffer],
-        [0, max_dimension - buffer]
+        [dest_width - buffer, 0],
+        [dest_width - buffer, dest_height - buffer],
+        [0, dest_height - buffer]
     ], dtype="float32")
 
-    return dest_corners, max_dimension, max_dimension
+    return dest_corners, dest_width, dest_height
 
 
 def homography(img: np.ndarray, src: np.ndarray, dest: np.ndarray) -> np.ndarray: 

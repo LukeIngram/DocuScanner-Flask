@@ -13,12 +13,10 @@ from backend.utils.verify import *
 from backend.utils.errors import FileError
 
 
-#TODO FileHandler 
-
 class FileHandler(): 
     
     """
-    TODO DOCSTRING
+    A class for handling file operations related to uploading, fetching, and saving images.
     """
 
     def __init__(self, uploads_path: str, outbox_path: str) -> None:
@@ -53,7 +51,7 @@ class FileHandler():
     def fetch_img(self, fname: str) -> np.ndarray:
         
         """
-        TODO DOCSTRING
+        Fetches an image from the uploads directory and converts it into a NumPy array.
         """
 
         try: 
@@ -72,8 +70,9 @@ class FileHandler():
     def fetch_download(self, fname: str) -> str: 
 
         """
-        TODO DOCSTRING
+        Retrieves the path for a file in the outbox directory
         """
+
         try: 
             fpath = os.path.join(self.outbox_path, fname)
         except FileNotFoundError: 
@@ -87,7 +86,7 @@ class FileHandler():
     def save_img(self, data: np.ndarray, fname: str) -> None: 
 
         """
-        TODO DOCSTRING
+        Saves an image represented as a NumPy array to the outbox directory.
         """
 
         fpath = os.path.join(self.outbox_path, fname)
@@ -96,9 +95,7 @@ class FileHandler():
         img.save(fpath)
 
 
-
-
-    
+'''
     def clear_uploads(self) -> None: 
         
         """
@@ -110,6 +107,8 @@ class FileHandler():
         """
         TODO DOCSTRING
         """ 
+
+'''
 
 
 

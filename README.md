@@ -1,3 +1,5 @@
+
+
 # **DocuScanner Flask**
 
 A web app designed for online document scanning. Featuring built-in ML-powered perspective correction. 
@@ -15,7 +17,8 @@ A web app designed for online document scanning. Featuring built-in ML-powered p
    - [Image Segmentation](#image-segmentation)
    - [Bounding Quadrilateral Approximation](#bounding-quadrilateral-approximation)
    - [Perspective Correction](#perspective-correction)
-4. [Future Work](#future-work)
+4. [Contact](#contact)
+5. [Future Work](#future-work)
 
 ## **Usage**
 
@@ -67,12 +70,25 @@ Approximation example:
 
 ![approximation_example](media/contour_repair.png)
 
+The implementation details can be found at [*app/backend/utils/boundingQuad.py*](https://github.com/LukeIngram/DocuScanner-Flask/blob/main/app/backend/utils/boundingQuad.py)
 
 
 ### **Perspective Correction**
 
 The core feature of this app is the *perspective transform*. 
 
+The first step is finding the new *corrected* corners of the quadrilateral. This is done by computing a four point linear transform from the quadrilateral approximated in the previous step. (More details can be found in [*app/backend/utils/transforms.py*](https://github.com/LukeIngram/DocuScanner-Flask/blob/main/app/backend/utils/transforms.py))
+
+Then the perspective is corrected using a process called a [homography](https://docs.opencv.org/4.x/d9/dab/tutorial_homography.html) transformation. 
+
+The results are as follows: 
+
+![sample](media/sample_correction.png)
+
+
+## **Contact** 
+
+Luke Ingram - lukeingram01@gmail.com
 
 
 ## **Future Work**
